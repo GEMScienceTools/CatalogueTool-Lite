@@ -2,18 +2,18 @@
 #
 # Copyright (C) 2010-2016 GEM Foundation
 #
-# The CATK (Lite) is free software: you can redistribute
-# it and/or modify it under the terms of the GNU Affero General Public
-# License as published by the Free Software Foundation, either version
-# 3 of the License, or (at your option) any later version.
+# OpenQuake is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# CATK is distributed in the hope that it will be useful,
+# OpenQuake is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# with this download. If not, see <http://www.gnu.org/licenses/>
+# along with OpenQuake. If not, see <http://www.gnu.org/licenses/>.
 #
 # Author: Poggi Valerio
 
@@ -70,7 +70,7 @@ class AsciiTable():
     for i, item in enumerate(self.data):
 
       # Check value types
-      if not value or type(data) != list:
+      if not data or type(data) != list:
         element = data
       else:
         element = data[i]
@@ -105,6 +105,24 @@ class AsciiTable():
     # Rename key in data structure
     for i, item in enumerate(self.data):
       self.data[i][new_key] = self.data[i].pop(old_key)
+
+
+  def Replace(self, key, old_value, new_value):
+    """
+    Replace occurences of a key give value.
+    If old_value is '*' it replaces all values.
+    """
+
+    # Loop over data
+    for i, item in enumerate(self.data):
+
+      # Replace all keys
+      if old_value == '*':
+        self.data[i][key] = new_value
+      # Replace matching values only
+      else:
+        if self.data[i][key] == old_value:
+          self.data[i][key] = new_value
 
 
   def Size(self):

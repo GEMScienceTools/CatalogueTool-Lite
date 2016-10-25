@@ -33,7 +33,11 @@ def LocationInit():
        'Latitude': None,
        'Longitude': None,
        'Depth': None,
-       'Code': None,
+       'SecError': None,
+       'LatError': None,
+       'LonError': None,
+       'DepError': None,
+       'LocCode': None,
        'Prime': False}
 
   return L
@@ -42,10 +46,10 @@ def LocationInit():
 
 def MagnitudeInit():
 
-  M = {'Size': None,
-       'Error': None,
-       'Type': None,
-       'Code': None}
+  M = {'MagSize': None,
+       'MagError': None,
+       'MagType': None,
+       'MagCode': None}
 
   return M
 
@@ -54,6 +58,7 @@ def MagnitudeInit():
 def CastValue(key, value):
 
   C = {'Id': 's',
+       'Log': 's',
        'Year': 'i',
        'Month': 'i',
        'Day': 'i',
@@ -63,11 +68,16 @@ def CastValue(key, value):
        'Latitude': 'f',
        'Longitude': 'f',
        'Depth': 'f',
-       'Code': 's',
+       'SecError': 'f',
+       'LatError': 'f',
+       'LonError': 'f',
+       'DepError': 'f',
+       'LocCode': 's',
        'Prime': 'b',
-       'Size': 'f',
-       'Error': 'f',
-       'Type': 's'}
+       'MagSize': 'f',
+       'MagError': 'f',
+       'MagType': 's',
+       'MagCode': 's'}
 
   if not IsEmpty(value):
     if C[key] == 'i':

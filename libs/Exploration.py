@@ -42,6 +42,7 @@ def AreaSelect(Db, XY, File=[], Owrite=False):
     Event['Id'] = E['Id']
     Event['Location'] = []
     Event['Magnitude'] = E['Magnitude']
+    Event['Log'] = E['Log']
 
     for L in E['Location']:
 
@@ -65,13 +66,61 @@ def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False):
 
   DbC = cp.deepcopy(Db)
 
-  DbC.Filter('Magnitude','Size',MinMag,Is='>=')
-  DbC.Filter('Magnitude','Size',MaxMag,Is='<')
+  DbC.Filter('Magnitude','MagSize',MinMag,Is='>=')
+  DbC.Filter('Magnitude','MagSize',MaxMag,Is='<')
 
   if Owrite:
     Db.Events = DbC.Events
   else:
     return DbC
+
+
+#-----------------------------------------------------------------------------------------
+
+def MagTypeSelect(Db, MagList, Owrite=False):
+
+  Keys = MagList.keys()
+
+  for K in Keys:
+    if not isinstance(MagList[K], list):
+      MagList[K] = [MagList[K]]
+
+  Db0 = Cat.Database()
+  Db0.Header = cp.deepcopy(Db.Header)
+
+  Db1 = Cat.Database()
+  Db1.Header = cp.deepcopy(Db.Header)
+
+  for E in Db.Events:
+    Stop = False
+
+    for M in E['Magnitude']:
+      for K in Keys:
+        if K == M['MagCode']:
+          for T in MagList[K]:
+            if T == M['MagType']:
+
+              Event = {}
+              Event['Id'] = E['Id']
+              Event['Log'] = E['Log']
+              Event['Location'] = E['Location']
+              Event['Magnitude'] = [M]
+
+              Db0.Events.append(cp.deepcopy(Event))
+              Stop = True
+
+            if Stop: break
+        if Stop: break
+      if Stop: break
+
+    if not Stop:
+      Db1.Events.append(cp.deepcopy(E))
+
+  if Owrite:
+    Db.Events = Db0.Events
+  else:
+    return Db0, Db1
+
 
 #-----------------------------------------------------------------------------------------
 
@@ -144,6 +193,7 @@ def SplitPrime(Db):
     Event['Id'] = E['Id']
     Event['Magnitude'] = E['Magnitude']
     Event['Location'] = []
+    Event['Log'] = E['Log']
 
     for L in E['Location']:
       if L['Prime']:
@@ -159,19 +209,22 @@ def SplitPrime(Db):
 
 #-----------------------------------------------------------------------------------------
 
-def MagnitudeReport(Db):
+def MagnitudeReport(Db, Threshold=0):
 
-  ItL, ItD = Db.Occurrence('Magnitude','Code')
+  ItL, ItD = Db.Occurrence('Magnitude','MagCode')
 
   for It in ItL:
-    DbC = Db.Filter('Magnitude','Code',It,Owrite=False)
-    MaL, MaD = DbC.Occurrence('Magnitude','Type')
+    DbC = Db.Filter('Magnitude','MagCode',It,Owrite=False)
+    MaL, MaD = DbC.Occurrence('Magnitude','MagType')
 
-    print 'Agency: {0}, Events: {1}'.format(It, ItD[It])
-    print 'Types: ',
-    for Ma in MaL:
-      print '{0} ({1})'.format(Ma, MaD[Ma]),
-    print ''
+    if ItD[It] >= Threshold:
+      print 'Agency: {0} | Events: {1} |'.format(It, ItD[It]),
+      print 'Types:',
+      for Ma in MaL:
+        print '{0} ({1})'.format(Ma, MaD[Ma]),
+      print ''
+    else:
+      return
 
 #-----------------------------------------------------------------------------------------
 

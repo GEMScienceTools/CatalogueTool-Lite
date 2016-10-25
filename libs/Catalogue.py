@@ -28,19 +28,23 @@ import CatUtils as CU
 
 class Database(object):
 
-  def __init__(self, Name=[]):
+  def __init__(self, Name=[], Info=[]):
 
-    self.Header = {'Name': Name}
+    self.Header = {'Name': Name, 'Info': Info}
     self.Events = []
 
   #---------------------------------------------------------------------------------------
 
-  def AddEvent(self, Id, Location=[], Magnitude=[], Append=False):
+  def AddEvent(self, Id, Location=[],
+                         Magnitude=[],
+                         Log=[],
+                         Append=False):
 
     Event = {}
     Event['Id'] = CU.CastValue('Id', Id)
     Event['Location'] = []
     Event['Magnitude'] = []
+    Event['Log'] = CU.CastValue('Log', Log)
 
     if Location:
 
@@ -125,16 +129,16 @@ class Database(object):
         print 'Latitude: {0}'.format(L['Latitude']),
         print 'Longitude: {0}'.format(L['Longitude']),
         print 'Depth: {0}'.format(L['Depth']),
-        print 'Code: {0}'.format(L['Code']),
+        print 'Agency: {0}'.format(L['LocCode']),
         print 'Prime: {0}'.format(L['Prime'])
 
       print 'Magnitude:'
       for m, M in enumerate(E['Magnitude']):
         print '[{0}] -'.format(m),
-        print 'Type: {0}'.format(M['Type']),
-        print 'Size: {0}'.format(M['Size']),
-        print 'Error: {0}'.format(M['Error']),
-        print 'Code: {0}'.format(M['Code'])
+        print 'Type: {0}'.format(M['MagType']),
+        print 'Size: {0}'.format(M['MagSize']),
+        print 'Error: {0}'.format(M['MagError']),
+        print 'Agency: {0}'.format(M['MagCode'])
 
     else:
       print 'Warning: Event not found'
@@ -192,6 +196,7 @@ class Database(object):
 
       if NewE[Str0]:
         NewE['Id'] = Event['Id']
+        NewE['Log'] = Event['Log']
         NewE[Str1] = Event[Str1]
         if First:
           NewE[Str0] = [NewE[Str0][0]]
@@ -268,9 +273,9 @@ class Database(object):
       for P in E['Magnitude']:
         for M in MagOld:
 
-          if P['Type'] == M:
-            P['Size'] = CU.CastValue('Size', MagConvFun(P['Size']))
-            P['Type'] = CU.CastValue('Type', MagNew)
+          if P['MagType'] == M:
+            P['MagSize'] = CU.CastValue('MagSize', MagConvFun(P['MagSize']))
+            P['MagType'] = CU.CastValue('MagType', MagNew)
 
   #---------------------------------------------------------------------------------------
 
@@ -425,16 +430,18 @@ class Database(object):
                   'Latitude',
                   'Longitude',
                   'Depth',
-                  'Size',
-                  'Type',
-                  'Error',
-                  'Code',
+                  'SecError',
+                  'LatError',
+                  'LonError',
+                  'DepError',
+                  'LocCode',
+                  'MagSize',
+                  'MagError',
+                  'MagType',
+                  'MagCode',
                   'Log']
 
     for Id, E in enumerate(self.Events):
-      Log = E['Location'][0]['Code']
-      Log += ' / '
-      Log += E['Magnitude'][0]['Code']
       Data = [E['Id'],
               E['Location'][0]['Year'],
               E['Location'][0]['Month'],
@@ -445,11 +452,16 @@ class Database(object):
               E['Location'][0]['Latitude'],
               E['Location'][0]['Longitude'],
               E['Location'][0]['Depth'],
-              E['Magnitude'][0]['Size'],
-              E['Magnitude'][0]['Type'],
-              E['Magnitude'][0]['Error'],
-              self.Header['Name'],
-              Log]
+              E['Location'][0]['SecError'],
+              E['Location'][0]['LatError'],
+              E['Location'][0]['LonError'],
+              E['Location'][0]['DepError'],
+              E['Location'][0]['LocCode'],
+              E['Magnitude'][0]['MagSize'],
+              E['Magnitude'][0]['MagError'],
+              E['Magnitude'][0]['MagType'],
+              E['Magnitude'][0]['MagCode'],
+              E['Log']]
 
       tab.AddElement(Data)
 

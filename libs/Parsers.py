@@ -73,16 +73,18 @@ class Database(Cat.Database):
         L['Latitude'] = IsfLoc[36:44].strip(' ')
         L['Longitude'] = IsfLoc[45:54].strip(' ')
         L['Depth'] = IsfLoc[71:76].strip(' ')
-        L['Code'] = IsfLoc[118:127].strip(' ')
+        L['SecError'] = IsfLoc[24:29].strip(' ')
+        L['DepError'] = IsfLoc[78:82].strip(' ')
+        L['LocCode'] = IsfLoc[118:127].strip(' ')
       return L
 
     def _GetMagnitude(IsfMag):
       M = {}
       if IsfMag:
-        M['Type'] = IsfMag[0:5].strip(' ')
-        M['Size'] = IsfMag[6:10].strip(' ')
-        M['Error'] = IsfMag[11:14].strip(' ')
-        M['Code'] = IsfMag[20:29].strip(' ')
+        M['MagType'] = IsfMag[0:5].strip(' ')
+        M['MagSize'] = IsfMag[6:10].strip(' ')
+        M['MagError'] = IsfMag[11:14].strip(' ')
+        M['MagCode'] = IsfMag[20:29].strip(' ')
       return M
 
 
@@ -119,7 +121,7 @@ class Database(Cat.Database):
         L['Latitude'] = HypoStr[27:33].strip(' ')
         L['Longitude'] = HypoStr[34:41].strip(' ')
         L['Depth'] = HypoStr[42:47].strip(' ')
-        L['Code'] = HypoStr[0:4].strip(' ')
+        L['LocCode'] = HypoStr[0:4].strip(' ')
       return L
 
     def _GetId(CmtStr):
@@ -142,10 +144,10 @@ class Database(Cat.Database):
       if CmtStr:
         # Hanks & Kanamori equation
         Moment = float(CmtStr[49:56])*(10.**E)
-        M['Size'] = ((2./3.)*mt.log10(Moment))-10.7
-        M['Type'] = 'MW'
-        M['Error'] = 0.
-        M['Code'] = 'GCMT-NDK'
+        M['MagSize'] = ((2./3.)*mt.log10(Moment))-10.7
+        M['MagType'] = 'MW'
+        M['MagError'] = 0.
+        M['MagCode'] = 'GCMT-NDK'
       return M
 
     # Open NDK file
