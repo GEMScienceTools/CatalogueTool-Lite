@@ -77,13 +77,10 @@ def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False):
 
 #-----------------------------------------------------------------------------------------
 
-def MagTypeSelect(Db, MagList, Owrite=False):
+def MagCodeSelect(Db, MagList, Best=False, Owrite=False):
 
-  Keys = MagList.keys()
-
-  for K in Keys:
-    if not isinstance(MagList[K], list):
-      MagList[K] = [MagList[K]]
+  Code = [M[0] for M in MagList]
+  Type = [M[1:] for M in MagList]
 
   Db0 = Cat.Database()
   Db0.Header = cp.deepcopy(Db.Header)
@@ -92,28 +89,72 @@ def MagTypeSelect(Db, MagList, Owrite=False):
   Db1.Header = cp.deepcopy(Db.Header)
 
   for E in Db.Events:
+
+    Event = {}
+    Event['Id'] = E['Id']
+    Event['Log'] = E['Log']
+    Event['Location'] = E['Location']
+    Event['Magnitude'] = []
     Stop = False
 
-    for M in E['Magnitude']:
-      for K in Keys:
-        if K == M['MagCode']:
-          for T in MagList[K]:
+    for I,C in enumerate(Code):
+      for M in E['Magnitude']:
+        if C == M['MagCode']:
+          for T in Type[I]:
             if T == M['MagType']:
 
-              Event = {}
-              Event['Id'] = E['Id']
-              Event['Log'] = E['Log']
-              Event['Location'] = E['Location']
-              Event['Magnitude'] = [M]
-
-              Db0.Events.append(cp.deepcopy(Event))
-              Stop = True
+              Event['Magnitude'].append(M)
+              if Best:
+                Stop = True
 
             if Stop: break
         if Stop: break
       if Stop: break
 
-    if not Stop:
+    if Event['Magnitude']:
+      Db0.Events.append(cp.deepcopy(Event))
+    else:
+      Db1.Events.append(cp.deepcopy(E))
+
+  if Owrite:
+    Db.Events = Db0.Events
+  else:
+    return Db0, Db1
+
+
+#-----------------------------------------------------------------------------------------
+
+def LocCodeSelect(Db, LocList, Best=False, Owrite=False):
+
+  Db0 = Cat.Database()
+  Db0.Header = cp.deepcopy(Db.Header)
+
+  Db1 = Cat.Database()
+  Db1.Header = cp.deepcopy(Db.Header)
+
+  for E in Db.Events:
+
+    Event = {}
+    Event['Id'] = E['Id']
+    Event['Log'] = E['Log']
+    Event['Location'] = []
+    Event['Magnitude'] = E['Magnitude']
+    Stop = False
+
+    for C in LocList:
+      for L in E['Location']:
+        if C == L['LocCode']:
+
+          Event['Location'].append(L)
+          if Best:
+           Stop = True
+
+        if Stop: break
+      if Stop: break
+
+    if Event['Location']:
+      Db0.Events.append(cp.deepcopy(Event))
+    else:
       Db1.Events.append(cp.deepcopy(E))
 
   if Owrite:
@@ -218,7 +259,7 @@ def MagnitudeReport(Db, Threshold=0):
     MaL, MaD = DbC.Occurrence('Magnitude','MagType')
 
     if ItD[It] >= Threshold:
-      print 'Agency: {0} | Events: {1} |'.format(It, ItD[It]),
+      print 'Agency: {0} | Occurrence: {1} |'.format(It, ItD[It]),
       print 'Types:',
       for Ma in MaL:
         print '{0} ({1})'.format(Ma, MaD[Ma]),
