@@ -21,6 +21,7 @@
 A simple tool to manipulate data from/to ascii files.
 """
 
+import copy as cp
 import numpy as np
 import fnmatch as fnm
 
@@ -154,12 +155,17 @@ class AsciiTable():
       for i in range(0, skipline):
         f.readline()
 
-      # Import header if not passed
+      # Import header (skip comments)
       if not header:
-        line = f.readline()
-        self.header = line.strip().split(delimiter)
-      else:
-        self.header= header
+        while 1:
+          line = f.readline()
+          if line[0] != comment: break
+        header = line.strip().split(delimiter)
+
+      # Removing empty fields from header
+      for h in header:
+        if h != '':
+          self.header.append(h)
 
       # Loop over lines
       for line in f:
@@ -170,19 +176,22 @@ class AsciiTable():
 
           # Loop over data values
           data = []
-          for i, k in enumerate(self.header):
+          for i, h in enumerate(header):
 
-            # Data type(s) switch
-            if type(dtype) == list:
-              dtp = dtype[i]
-            else:
-              dtp = dtype
+            # Skip empty header fields
+            if h != '':
 
-            # Check for empty fields
-            if not value[i]:
-              value[i] = empty
+              # Data type(s) switch
+              if type(dtype) == list:
+                dtp = dtype[i]
+              else:
+                dtp = dtype
 
-            data.append(_CastValue(value[i],dtp))
+              # Check for empty elements
+              if not value[i]:
+                value[i] = empty
+
+              data.append(_CastValue(value[i],dtp))
 
           self.AddElement(data)
 
@@ -278,7 +287,7 @@ class AsciiTable():
         if not _isNaN(item[key]):
           ik = _CastValue(item[key])
 
-          if ik >= filter_key[0] and ik < filter_key[1]:
+          if ik >= filter_key[0] and ik <= filter_key[1]:
             NewTab.data.append(item)
 
     return NewTab
