@@ -37,14 +37,14 @@ class Database(object):
 
   def AddEvent(self, Id, Location=[],
                          Magnitude=[],
-                         Log=[],
+                         Log='',
                          Append=False):
 
     Event = {}
     Event['Id'] = CU.CastValue('Id', Id)
+    Event['Log'] = Log
     Event['Location'] = []
     Event['Magnitude'] = []
-    Event['Log'] = CU.CastValue('Log', Log)
 
     if Location:
 
@@ -286,75 +286,6 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Merge(self, Db, Twin=60., Swin=50., Owrite=True,
-                                          Log=False,
-                                          Verbose=False):
-
-    def GetDate(Event):
-
-      L = Event['Location'][0]
-      S = CU.DateToSec(int(L['Year']),
-                       int(L['Month']),
-                       int(L['Day']),
-                       int(L['Hour']),
-                       int(L['Minute']),
-                       int(L['Second']))
-      return S
-
-    def GetCoor(Event):
-      L = Event['Location'][0]
-      X = L['Longitude']
-      Y = L['Latitude']
-      return [X, Y]
-
-    def DeltaSec(S0, S1):
-      Sec = ma.fabs(S1-S0)
-      return Sec
-
-    def DeltaLen(C0, C1):
-      Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
-      return Dis
-
-    Db0 = self.Copy()
-    Db1 = Db.Copy()
-    Log = []
-
-    for J, E0 in enumerate(Db0.Events):
-      T0 = GetDate(E0)
-      C0 = GetCoor(E0)
-
-      for I, E1 in enumerate(Db1.Events):
-        T1 = GetDate(E1)
-        dT = DeltaSec(T0, T1)
-
-        if (dT <= Twin):
-          C1 = GetCoor(E1)
-          dC = DeltaLen(C0, C1)
-
-          if (dC <= Swin):
-            E0['Location'].extend(E1['Location'])
-            E0['Magnitude'].extend(E1['Magnitude'])
-            Log.append((E0['Id'], E1['Id'], dT, dC))
-            del Db1.Events[I]
-            break
-
-    Db0.Append(Db1)
-
-    if Verbose:
-      print 'Number of duplicate events:', len(Log)
-
-    if Owrite:
-      self.Events = Db0.Events
-      if Log:
-        return Log
-    else:
-      if Log:
-        return Db0, Log
-      else:
-        return Db0
-
-  #---------------------------------------------------------------------------------------
-
   def Copy(self):
 
     NewCat = Database()
@@ -370,12 +301,12 @@ class Database(object):
     for E in self.Events:
 
       L = E['Location'][0]
-      S = CU.DateToSec(int(L['Year']),
-                       int(L['Month']),
-                       int(L['Day']),
-                       int(L['Hour']),
-                       int(L['Minute']),
-                       int(L['Second']))
+      S = CU.DateToSec(L['Year'],
+                       L['Month'],
+                       L['Day'],
+                       L['Hour'],
+                       L['Minute'],
+                       L['Second'])
       Sec.append(S)
 
     # Get indexes of the sorted list
