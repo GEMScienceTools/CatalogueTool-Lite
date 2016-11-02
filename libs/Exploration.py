@@ -18,6 +18,7 @@
 # Author: Poggi Valerio
 
 import copy as cp
+import math as ma
 
 import Catalogue as Cat
 import CatUtils as CU
@@ -74,7 +75,6 @@ def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False):
   else:
     return DbC
 
-
 #-----------------------------------------------------------------------------------------
 
 def MagCodeSelect(Db, MagList, Best=False, Owrite=False):
@@ -121,7 +121,6 @@ def MagCodeSelect(Db, MagList, Best=False, Owrite=False):
   else:
     return Db0, Db1
 
-
 #-----------------------------------------------------------------------------------------
 
 def LocCodeSelect(Db, LocList, Best=False, Owrite=False):
@@ -161,7 +160,6 @@ def LocCodeSelect(Db, LocList, Best=False, Owrite=False):
     Db.Events = Db0.Events
   else:
     return Db0, Db1
-
 
 #-----------------------------------------------------------------------------------------
 
@@ -277,3 +275,84 @@ def GetHypocenter(Db):
 
   return x, y, z
 
+#-----------------------------------------------------------------------------------------
+
+def MergeDuplicate(DbA, DbB=[],
+                        Twin=60.,
+                        Swin=50.,
+                        Owrite=True,
+                        Log=False):
+
+  def GetDate(Event):
+
+    L = Event['Location'][0]
+    S = CU.DateToSec(L['Year'],
+                     L['Month'],
+                     L['Day'],
+                     L['Hour'],
+                     L['Minute'],
+                     L['Second'])
+    return S
+
+  def GetCoor(Event):
+    L = Event['Location'][0]
+    X = L['Longitude']
+    Y = L['Latitude']
+    return [X, Y]
+
+  def DeltaSec(S0, S1):
+    Sec = ma.fabs(S1-S0)
+    return Sec
+
+  def DeltaLen(C0, C1):
+    Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
+    return Dis
+
+  Db0 = DbA.Copy()
+  Db1 = DbB.Copy() if DbB else DbA.Copy()
+  End = None if DbB else -1
+  LogE = []
+  Ind = []
+
+  for J, E0 in enumerate(Db0.Events[:End]):
+    T0 = GetDate(E0)
+    C0 = GetCoor(E0)
+
+    Start = 0 if DbB else J+1
+    E0['Log'] += 'ID({0});'.format(E0['Id'])
+
+    for I, E1 in enumerate(Db1.Events[Start:]):
+      C1 = GetCoor(E1)
+      dC = DeltaLen(C0, C1)
+
+      if (dC <= Swin):
+        T1 = GetDate(E1)
+        dT = DeltaSec(T0, T1)
+
+        if (dT <= Twin):
+          E0['Location'].extend(E1['Location'])
+          E0['Magnitude'].extend(E1['Magnitude'])
+          E0['Log'] += 'ID({0});'.format(E1['Id'])
+          LogE.append((I, E0['Id'], J, E1['Id'], dT, dC))
+          Ind.append(Start+I)
+
+  if DbB:
+    for I in range(0,Db1.Size()):
+      if I not in Ind:
+        Db0.Events.append(Db1.Events[I])
+
+  else:
+    for I in Ind:
+      Db0.Events[I] = []
+    Db0.Events = [e for e in Db0.Events if e]
+
+  if Owrite:
+    DbA.Events = Db0.Events
+    if Log:
+      return LogE
+
+  else:
+    if Log:
+      return Db0, LogE
+    else:
+      return Db0

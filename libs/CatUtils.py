@@ -163,6 +163,13 @@ def LeapCheck(Year):
 
 def DateToSec(Year, Month, Day, Hour, Minute, Second):
 
+  if not Year: Year = 1
+  if not Month: Month = 1
+  if not Day: Day = 1
+  if not Hour: Hour = 0
+  if not Minute: Minute = 0
+  if not Second: Second = 0
+
   DSEC = 24.*3600.
   YDAYS = 365.
 

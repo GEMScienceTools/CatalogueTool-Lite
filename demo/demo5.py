@@ -10,7 +10,7 @@ Db1.Load('data/isc-rev-africa-select.bin')
 Db2 = Cat.Database()
 Db2.Load('data/isc-gem-v3.bin')
 
-Log = Db1.Merge(Db2,Twin=60.,Swin=50.,Log=1)
+Log = Db1.MergeDuplicate(Db2,Twin=60.,Swin=50.,Log=1)
 
 CodeList = ['ISC-GEM','ISC-HOM']
 
