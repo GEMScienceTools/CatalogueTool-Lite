@@ -7,9 +7,13 @@ import Exploration as Exp
 import MapTools as Map
 import CatUtils as Ct
 
+#-----------------------------------------------------------------------------------------
+# Import catalogue
+
 Db1 = Cat.Database()
 Db1.Load('data/isc-rev-africa-select.bin')
 
+#-----------------------------------------------------------------------------------------
 # Filtering by polygon
 
 # As WKT Format or List
@@ -39,8 +43,14 @@ if CASE == 4:
   P = Ct.Polygon()
   P.Import(p,Type='wkt')
 
+#-----------------------------------------------------------------------------------------
+# Get Coordinates
+
 x1,y1,z1 = Exp.GetHypocenter(Db1)
 x2,y2,z2 = Exp.GetHypocenter(Db2)
+
+#-----------------------------------------------------------------------------------------
+# Map Plot
 
 # Reshape polygon (to plot area)
 P.x.append(P.x[0])

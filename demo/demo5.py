@@ -3,6 +3,11 @@ EXAMPLE 5 - CATALOGUE MERGING
 """
 
 import Catalogue as Cat
+import Exploration as Exp
+import MagRules as MR
+
+#-----------------------------------------------------------------------------------------
+# Import Catalogues
 
 Db1 = Cat.Database()
 Db1.Load('data/isc-rev-africa-select.bin')
@@ -10,10 +15,20 @@ Db1.Load('data/isc-rev-africa-select.bin')
 Db2 = Cat.Database()
 Db2.Load('data/isc-gem-v3.bin')
 
-Log = Db1.MergeDuplicate(Db2,Twin=60.,Swin=50.,Log=1)
+#-----------------------------------------------------------------------------------------
+# Duplicate findings
 
-CodeList = ['ISC-GEM','ISC-HOM']
+# Between Catalogues
+Db3, Log = Exp.MergeDuplicate(Db1,Db2,Twin=60.,Swin=50.,Log=1, Owrite=False)
 
-Db1.Filter('Location','Code',CodeList,First=1)
-Db1.Filter('Magnitude','Code',CodeList,First=1)
+# Within a catalogue
+Log = Exp.MergeDuplicate(Db1,Twin=60.,Swin=50.,Log=1)
 
+#-----------------------------------------------------------------------------------------
+# Magnitude conversion
+
+# Apply to all agency
+Exp.MagConvert(Db1,'*',['Ms','MS'],'Mw',MR.MsMw_Scordillis2006)
+
+# Apply to single agency
+Exp.MagConvert(Db1,'ISC','Ms','Mw',MR.MsMw_Scordillis2006)
