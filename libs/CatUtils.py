@@ -95,6 +95,22 @@ def CastValue(key, value):
 
 #-----------------------------------------------------------------------------------------
 
+def KeyGroup(key):
+
+  L = LocationInit()
+  M = MagnitudeInit()
+  G = []
+
+  if key in L.keys():
+    G = 'Location'
+
+  if key in M.keys():
+    G = 'Magnitude'
+
+  return G
+
+#-----------------------------------------------------------------------------------------
+
 def IsEmpty(number):
 
   C0 = (number == [])

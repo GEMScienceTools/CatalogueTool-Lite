@@ -140,6 +140,9 @@ class Database(object):
         print 'Error: {0}'.format(M['MagError']),
         print 'Agency: {0}'.format(M['MagCode'])
 
+      print 'Log:'
+      print '{0}'.format(E['Log'])
+
     else:
       print 'Warning: Event not found'
 
@@ -151,10 +154,12 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def SetKey(self, Param, Key, Value, Match=[]):
+  def SetKey(self, Key, Value, Match=[]):
+
+    Group = CU.KeyGroup(Key)
 
     for E in self.Events:
-      for P in E[Param]:
+      for P in E[Group]:
 
         if Match and (P[Match[0]] == Match[1]):
           P[Key] = CU.CastValue(Key, Value)
@@ -164,12 +169,22 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Filter(self, Param, Key, Value, Is='=',
-                                      First=False,
-                                      All=False,
-                                      Owrite=True):
+  def SetID(self, Str0='', Str1=''):
 
-    def Search(Event, Value, Str0, Str1, Is, First):
+    LZ = len(str(self.Size()))
+
+    for I, E in enumerate(self.Events):
+      E['Log'] += 'ID({0});'.format(E['Id'])
+      E['Id'] = Str0+str(I).zfill(LZ)+Str1
+
+  #---------------------------------------------------------------------------------------
+
+  def Filter(self,Key, Value, Opr='=',
+                              Best=False,
+                              All=False,
+                              Owrite=True):
+
+    def Search(Event, Value, Str0, Str1, Opr, Best):
 
       NewE = {}
       NewE[Str1] = []
@@ -179,17 +194,17 @@ class Database(object):
       for V in Value:
         for E in Event[Str0]:
 
-          if (Is == '=') and (E[Key] == V):
+          if (Opr == '=') and (E[Key] == V):
               NewE[Str0].append(E)
-          if (Is == '!=') and (E[Key] != V):
+          if (Opr == '!=') and (E[Key] != V):
               NewE[Str0].append(E)
-          if (Is == '>') and (E[Key] > V):
+          if (Opr == '>') and (E[Key] > V):
               NewE[Str0].append(E)
-          if (Is == '<') and (E[Key] < V):
+          if (Opr == '<') and (E[Key] < V):
               NewE[Str0].append(E)
-          if (Is == '>=') and (E[Key] >= V):
+          if (Opr == '>=') and (E[Key] >= V):
               NewE[Str0].append(E)
-          if (Is == '<=') and (E[Key] <= V):
+          if (Opr == '<=') and (E[Key] <= V):
               NewE[Str0].append(E)
 
       Klist = [k[Key] for k in NewE[Str0]]
@@ -198,7 +213,7 @@ class Database(object):
         NewE['Id'] = Event['Id']
         NewE['Log'] = Event['Log']
         NewE[Str1] = Event[Str1]
-        if First:
+        if Best:
           NewE[Str0] = [NewE[Str0][0]]
 
       return NewE, Klist
@@ -209,13 +224,15 @@ class Database(object):
     if not CU.IsType(Value, 'l'):
       Value = [Value]
 
+    Group = CU.KeyGroup(Key)
+
     for E in self.Events:
 
-      if Param == 'Location':
-        E, Klist = Search(E, Value, 'Location', 'Magnitude', Is, First)
+      if Group == 'Location':
+        E, Klist = Search(E, Value, 'Location', 'Magnitude', Opr, Best)
 
-      if Param == 'Magnitude':
-        E, Klist = Search(E, Value, 'Magnitude', 'Location', Is, First)
+      if Group == 'Magnitude':
+        E, Klist = Search(E, Value, 'Magnitude', 'Location', Opr, Best)
 
       if E['Location'] or E['Magnitude']:
         if All:
@@ -231,23 +248,27 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Extract(self, Param, Key=[]):
+  def Extract(self, Key=[]):
 
-    if Param == 'Id':
-      Values = [E[Param] for E in self.Events]
+    Group = CU.KeyGroup(Key)
+
+    if Key == 'Id' or Key == 'Log':
+      Values = [E[Key] for E in self.Events]
     else:
-      Values = [E[Param][0][Key] for E in self.Events]
+      Values = [E[Group][0][Key] for E in self.Events]
 
     return Values
 
   #---------------------------------------------------------------------------------------
 
-  def Occurrence(self, Param, Key, Verbose=False):
+  def Occurrence(self, Key, Verbose=False):
 
     ItemList = []
 
+    Group = CU.KeyGroup(Key)
+
     for E in self.Events:
-      for P in E[Param]:
+      for P in E[Group]:
         Item = P[Key]
         ItemList.append(Item)
 
@@ -261,21 +282,6 @@ class Database(object):
         print w, ':', ItemDict[w]
 
     return ItemList, ItemDict
-
-  #---------------------------------------------------------------------------------------
-
-  def MagConvert(self, MagOld, MagNew, MagConvFun):
-
-    if not CU.IsType(MagOld, 'l'):
-      MagOld = [MagOld]
-
-    for E in self.Events:
-      for P in E['Magnitude']:
-        for M in MagOld:
-
-          if P['MagType'] == M:
-            P['MagSize'] = CU.CastValue('MagSize', MagConvFun(P['MagSize']))
-            P['MagType'] = CU.CastValue('MagType', MagNew)
 
   #---------------------------------------------------------------------------------------
 

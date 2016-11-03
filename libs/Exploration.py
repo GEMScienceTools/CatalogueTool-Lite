@@ -65,14 +65,30 @@ def AreaSelect(Db, XY, File=[], Owrite=False):
 
 def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False):
 
-  DbC = cp.deepcopy(Db)
+  if Owrite:
+    DbC = Db
+  else:
+    DbC = Db.Copy()
 
-  DbC.Filter('Magnitude','MagSize',MinMag,Is='>=')
-  DbC.Filter('Magnitude','MagSize',MaxMag,Is='<')
+  DbC.Filter('MagSize',MinMag,Opr='>=')
+  DbC.Filter('MagSize',MaxMag,Opr='<')
+
+  if not Owrite:
+    return DbC
+
+#-----------------------------------------------------------------------------------------
+
+def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False):
 
   if Owrite:
-    Db.Events = DbC.Events
+    DbC = Db
   else:
+    DbC = Db.Copy()
+
+  DbC.Filter('Depth',MinDep,Opr='>=')
+  DbC.Filter('Depth',MaxDep,Opr='<')
+
+  if not Owrite:
     return DbC
 
 #-----------------------------------------------------------------------------------------
@@ -163,7 +179,7 @@ def LocCodeSelect(Db, LocList, Best=False, Owrite=False):
 
 #-----------------------------------------------------------------------------------------
 
-def TimeSelect(Db, Date0, Date1):
+def TimeSelect(Db, Date0, Date1, Owrite=False):
 
   Def0 = [1900,1,1,0,0,0]
   Def1 = [2000,12,31,23,59,59]
@@ -194,12 +210,12 @@ def TimeSelect(Db, Date0, Date1):
 
   def GetSec(Event):
     L = Event['Location'][0]
-    S = CU.DateToSec(int(L['Year']),
-                     int(L['Month']),
-                     int(L['Day']),
-                     int(L['Hour']),
-                     int(L['Minute']),
-                     int(L['Second']))
+    S = CU.DateToSec(L['Year'],
+                     L['Month'],
+                     L['Day'],
+                     L['Hour'],
+                     L['Minute'],
+                     L['Second'])
     return S
 
   Sec = []
@@ -214,7 +230,10 @@ def TimeSelect(Db, Date0, Date1):
   for I in Ind:
     DbN.Events.append(cp.deepcopy(Db.Events[I]))
 
-  return DbN
+  if Owrite:
+    Db.Events = DbN.Events
+  else:
+    return DbN
 
 #-----------------------------------------------------------------------------------------
 
@@ -269,9 +288,9 @@ def MagnitudeReport(Db, Threshold=0):
 
 def GetHypocenter(Db):
 
-  x = Db.Extract('Location','Longitude')
-  y = Db.Extract('Location','Latitude')
-  z = Db.Extract('Location','Depth')
+  x = Db.Extract('Longitude')
+  y = Db.Extract('Latitude')
+  z = Db.Extract('Depth')
 
   return x, y, z
 
@@ -313,13 +332,13 @@ def MergeDuplicate(DbA, DbB=[],
   End = None if DbB else -1
   LogE = []
   Ind = []
+  Name = Db1.Header['Name']
 
   for J, E0 in enumerate(Db0.Events[:End]):
     T0 = GetDate(E0)
     C0 = GetCoor(E0)
 
     Start = 0 if DbB else J+1
-    E0['Log'] += 'ID({0});'.format(E0['Id'])
 
     for I, E1 in enumerate(Db1.Events[Start:]):
       C1 = GetCoor(E1)
@@ -332,8 +351,8 @@ def MergeDuplicate(DbA, DbB=[],
         if (dT <= Twin):
           E0['Location'].extend(E1['Location'])
           E0['Magnitude'].extend(E1['Magnitude'])
-          E0['Log'] += 'ID({0});'.format(E1['Id'])
-          LogE.append((I, E0['Id'], J, E1['Id'], dT, dC))
+          E0['Log'] += 'MERG({0},{1});'.format(Name,E1['Id'])
+          LogE.append((J, E0['Id'], Start+I, E1['Id'], dT, dC))
           Ind.append(Start+I)
 
   if DbB:
@@ -356,3 +375,43 @@ def MergeDuplicate(DbA, DbB=[],
       return Db0, LogE
     else:
       return Db0
+
+#-----------------------------------------------------------------------------------------
+
+def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
+
+  if type(MagOld) != list:
+    MagOld = [MagOld]
+
+  if type(MagOld) != list:
+    MagOld = [MagOld]
+
+  if Owrite:
+    DbC = Db
+  else:
+    DbC = Db.Copy()
+
+  for E in DbC.Events:
+    for A in E['Magnitude']:
+
+      for Agn in MagAgency:
+        if A['MagCode'] == Agn or Agn == '*':
+
+          for Mag in MagOld:
+            if A['MagType'] == Mag or Mag == '*':
+
+              MS = A['MagSize']
+              ME = A['MagError']
+
+              if not MS: MS = None
+              if not ME: ME = 0
+
+              ms,me = ConvFun(MS,ME)
+
+              A['MagSize'] = CU.CastValue('MagSize', ms)
+              A['MagError'] = CU.CastValue('MagError', me)
+              A['MagType'] = CU.CastValue('MagType', MagNew)
+              E['Log'] += 'ORMAG({0},{1});'.format(A['MagCode'],A['MagType'])
+
+  if not Owrite:
+    return DbC
