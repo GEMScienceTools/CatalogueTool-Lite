@@ -267,22 +267,60 @@ def SplitPrime(Db):
 
 #-----------------------------------------------------------------------------------------
 
-def MagnitudeReport(Db, Threshold=0):
+def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
-  ItL, ItD = Db.Occurrence('Magnitude','MagCode')
+  if Code in ['Magnitude','Mag','M']:
+    ItL, ItD = Db.Occurrence('MagCode')
+  elif Code in ['Location','Loc','L']:
+    ItL, ItD = Db.Occurrence('LocCode')
+  else:
+    print 'Error: No valid code'
+    return
+
+  # Report only specific keys
+  if Key:
+    ItLs = []
+    ItDs = {}
+
+    if type(Key) != list:
+      Key = [Key]
+
+    for K in Key:
+     if K in ItL:
+       ItLs.append(K)
+       ItDs[K] = ItD[K]
+    ItL = ItLs
+    ItD = ItDs
+
+  StrLog = ''
 
   for It in ItL:
-    DbC = Db.Filter('Magnitude','MagCode',It,Owrite=False)
-    MaL, MaD = DbC.Occurrence('Magnitude','MagType')
-
     if ItD[It] >= Threshold:
-      print 'Agency: {0} | Occurrence: {1} |'.format(It, ItD[It]),
-      print 'Types:',
-      for Ma in MaL:
-        print '{0} ({1})'.format(Ma, MaD[Ma]),
-      print ''
+      StrLog += 'Agency: {0} | Occurrence: {1}'.format(It, ItD[It])
+
+      if Code in ['Magnitude','Mag','M']:
+        DbC = Db.Filter('MagCode',It,Owrite=False)
+        MaL, MaD = DbC.Occurrence('MagType')
+
+        StrLog += ' | Types:'
+        for Ma in MaL:
+          StrLog += ' {0} ({1})'.format(Ma, MaD[Ma])
+
+      StrLog += '\n'
     else:
+      break
+
+  if LogFile:
+    # Open input ascii file
+    with open(LogFile, 'w') as f:
+      f.write(StrLog)
+      f.close()
       return
+    # Warn user if model file does not exist
+    print 'Cannot open file'
+
+  else:
+    print StrLog
 
 #-----------------------------------------------------------------------------------------
 
@@ -293,6 +331,32 @@ def GetHypocenter(Db):
   z = Db.Extract('Depth')
 
   return x, y, z
+
+#-----------------------------------------------------------------------------------------
+
+def GetMagnitudePair(Db, Code1, Code2):
+
+  Db1 = Db.Copy()
+  Db1.Filter('MagCode',Code1[0])
+  Db1.Filter('MagType',Code1[1])
+
+  Db2 = Db.Copy()
+  Db2.Filter('MagCode',Code2[0])
+  Db2.Filter('MagType',Code2[1])
+
+  Id1 = Db1.Extract('Id')
+  Id2 = Db2.Extract('Id')
+
+  Id = [x for x in Id1 if x in Id2]
+
+  M1 = []
+  M2 = []
+
+  for i in Id:
+    M1.append(Db1.Events[Db1.GetIndex(i)][0]['MagSize'])
+    M2.append(Db1.Events[Db1.GetIndex(i)][0]['MagSize'])
+
+  return M1, M2
 
 #-----------------------------------------------------------------------------------------
 
