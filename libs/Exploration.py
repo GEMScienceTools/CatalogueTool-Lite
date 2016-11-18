@@ -95,6 +95,9 @@ def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False):
 
 def MagCodeSelect(Db, MagList, Best=False, Owrite=False):
 
+  if type(MagList) != list:
+    MagList = [MagList]
+
   Code = [M[0] for M in MagList]
   Type = [M[1:] for M in MagList]
 
@@ -140,6 +143,9 @@ def MagCodeSelect(Db, MagList, Best=False, Owrite=False):
 #-----------------------------------------------------------------------------------------
 
 def LocCodeSelect(Db, LocList, Best=False, Owrite=False):
+
+  if type(LocList) != list:
+    LocList = [LocList]
 
   Db0 = Cat.Database()
   Db0.Header = cp.deepcopy(Db.Header)
@@ -336,27 +342,32 @@ def GetHypocenter(Db):
 
 def GetMagnitudePair(Db, Code1, Code2):
 
-  Db1 = Db.Copy()
-  Db1.Filter('MagCode',Code1[0])
-  Db1.Filter('MagType',Code1[1])
+  Mout = [[],[],[],[]]
 
-  Db2 = Db.Copy()
-  Db2.Filter('MagCode',Code2[0])
-  Db2.Filter('MagType',Code2[1])
+  for E in Db.Events:
+    m1 = None
+    m2 = None
 
-  Id1 = Db1.Extract('Id')
-  Id2 = Db2.Extract('Id')
+    for M in E['Magnitude']:
+      MC = M['MagCode']
+      MT = M['MagType']
+      MS = M['MagSize']
+      ME = M['MagError']
 
-  Id = [x for x in Id1 if x in Id2]
+      if MC == Code1[0] and MT == Code1[1]:
+        m1 = MS
+        e1 = ME
+      if MC == Code2[0] and MT == Code2[1]:
+        m2 = MS
+        e2 = ME
 
-  M1 = []
-  M2 = []
+    if m1 and m2:
+      Mout[0].append(m1)
+      Mout[1].append(m2)
+      Mout[2].append(e1)
+      Mout[3].append(e2)
 
-  for i in Id:
-    M1.append(Db1.Events[Db1.GetIndex(i)][0]['MagSize'])
-    M2.append(Db1.Events[Db1.GetIndex(i)][0]['MagSize'])
-
-  return M1, M2
+  return Mout
 
 #-----------------------------------------------------------------------------------------
 
