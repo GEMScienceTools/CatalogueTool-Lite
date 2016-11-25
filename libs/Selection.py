@@ -328,7 +328,7 @@ def MergeDuplicate(DbA, DbB=[],
         if (dT <= Twin):
           E0['Location'].extend(E1['Location'])
           E0['Magnitude'].extend(E1['Magnitude'])
-          E0['Log'] += 'MERG({0},{1});'.format(Name,E1['Id'])
+          E0['Log'] += 'MERGED({0}:{1});'.format(Name,E1['Id'])
           LogE.append((J, E0['Id'], Start+I, E1['Id'], dT, dC))
           Ind.append(Start+I)
 
@@ -336,6 +336,7 @@ def MergeDuplicate(DbA, DbB=[],
     for I in range(0,Db1.Size()):
       if I not in Ind:
         Db0.Events.append(Db1.Events[I])
+        Db0.Events[-1]['Log'] += 'ADDED({0});'.format(Name)
 
   else:
     for I in Ind:
@@ -385,10 +386,14 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
 
               ms,me = ConvFun(MS,ME)
 
+              # Rounding
+              ms = float(format(ms,'.2f'))
+              me = float(format(me,'.2f'))
+
+              E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
               A['MagSize'] = CU.CastValue('MagSize', ms)
               A['MagError'] = CU.CastValue('MagError', me)
               A['MagType'] = CU.CastValue('MagType', MagNew)
-              E['Log'] += 'ORMAG({0},{1});'.format(A['MagCode'],A['MagType'])
 
   if not Owrite:
     return DbC

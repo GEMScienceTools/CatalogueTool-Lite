@@ -174,7 +174,7 @@ class Database(object):
     LZ = len(str(self.Size()))
 
     for I, E in enumerate(self.Events):
-      E['Log'] += 'ID({0});'.format(E['Id'])
+      E['Log'] += 'PREID({0});'.format(E['Id'])
       E['Id'] = Str0+str(I).zfill(LZ)+Str1
 
   #---------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ import math as mt
 #----------------------------------------------
 # Generic
 
-def Mw_Mw_Generic(MagSize, MagError)
+def Mw_Mw_Generic(MagSize, MagError):
   """
   """
 
@@ -35,6 +35,7 @@ def Mw_Mw_Generic(MagSize, MagError)
 
 def Ms_Mw_Scordilis2006(MagSize, MagError):
   """
+  Linear
   """
 
   if MagSize >= 3.0 and MagSize <= 6.1:
@@ -55,6 +56,7 @@ def Ms_Mw_Scordilis2006(MagSize, MagError):
 
 def mb_Mw_Scordilis2006(MagSize, MagError):
   """
+  Linear
   """
 
   if MagSize >= 3.5 and MagSize <= 6.2:
@@ -206,3 +208,53 @@ def Msz_Mw_NEIC_Weatherill2016(MagSize, MagError):
   return (M, E)
 
 # mb >> Mw ------------------------------------
+
+def mb_Mw_ISC_Weatherill2016(MagSize, MagError):
+  """
+  Linear
+  """
+
+  if MagSize >= 3.5 and MagSize <= 7.0:
+    M = 1.048 * MagSize - 0.142
+    E = mt.sqrt(0.317**2. + MagError**2.)
+
+  else:
+    M = None
+    E = None
+
+  return (M, E)
+
+def mb_Mw_NEIC_Weatherill2016(MagSize, MagError):
+  """
+  Linear
+  """
+
+  if MagSize >= 3.5 and MagSize <= 7.0:
+    M = 1.044 * MagSize - 0.331
+    E = mt.sqrt(0.224**2. + MagError**2.)
+
+  else:
+    M = None
+    E = None
+
+  return (M, E)
+
+#----------------------------------------------
+# Edwards 2010
+#
+# Ml >> Mw ------------------------------------
+
+def Ml_Mw_Edwards2010(MagSize, MagError):
+  """
+  Ploynomial
+  """
+
+  if MagSize <= 6.0:
+    M = 0.0491 * MagSize**2 + 0.472 * MagSize + 1.02
+    E = mt.sqrt(0.15**2. + MagError**2.)
+
+  else:
+    M = None
+    E = None
+
+  return (M, E)
