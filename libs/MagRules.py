@@ -230,8 +230,8 @@ def mb_Mw_NEIC_Weatherill2016(MagSize, MagError):
   """
 
   if MagSize >= 3.5 and MagSize <= 7.0:
-    M = 1.044 * MagSize - 0.331
-    E = mt.sqrt(0.224**2. + MagError**2.)
+    M = 1.159 * MagSize - 0.659
+    E = mt.sqrt(0.283**2. + MagError**2.)
 
   else:
     M = None

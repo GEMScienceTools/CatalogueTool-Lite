@@ -120,7 +120,7 @@ def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
 #-----------------------------------------------------------------------------------------
 
-def TimePlot(Db, Code, Key=[], Year0=[], Year1=[], Delta=5, Threshold=50):
+def TimePlot(Db, Code, Key=[], Year0=[], Year1=[], Delta=5, Threshold=0, OutFile=[]):
 
   if not Year0:
     Year0 = min(Db.Extract('Year'))
@@ -179,3 +179,6 @@ def TimePlot(Db, Code, Key=[], Year0=[], Year1=[], Delta=5, Threshold=50):
   plt.tight_layout()
 
   plt.show(block=False)
+
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
