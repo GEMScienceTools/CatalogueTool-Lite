@@ -267,11 +267,17 @@ class GeoMap:
 
   #---------------------------------------------------------------------------------------
 
-  def Legend(self):
+  def Legend(self, Location=[]):
 
-    plt.legend(bbox_to_anchor = (1.05, 1), 
-               loc = 2, borderaxespad = 0.,
-               numpoints = 1)
+    self._zo += 1
+    if Location:
+      l = plt.legend(loc = Location, numpoints = 1)
+    else:
+      # Default outside
+      l = plt.legend(bbox_to_anchor = (1.05, 1), 
+                     loc = 2, borderaxespad = 0.,
+                     numpoints = 1)
+    l.set_zorder(self._zo)
 
   #---------------------------------------------------------------------------------------
 

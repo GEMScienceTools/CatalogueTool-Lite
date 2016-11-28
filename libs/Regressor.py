@@ -106,7 +106,6 @@ class Data(object):
                 np.min(self.Y)-1,
                 np.max(self.Y)+1]
 
-      print Axis[0]
       Ax = np.linspace(Axis[0],Axis[1],100)
 
       plt.plot(Ax, Ax, color=(1,0,0),
