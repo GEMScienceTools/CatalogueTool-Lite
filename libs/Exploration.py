@@ -17,6 +17,8 @@
 #
 # Author: Poggi Valerio
 
+import Selection as Sel
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -120,14 +122,14 @@ def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
 #-----------------------------------------------------------------------------------------
 
-def TimePlot(Db, Code, Key=[], Year0=[], Year1=[], Delta=5, Threshold=0, OutFile=[]):
+def KeyTimeHisto(Db, Code, Key=[],
+                           Year0=[], Year1=[], Delta=5,
+                           Threshold=0, OutFile=[]):
 
   if not Year0:
     Year0 = min(Db.Extract('Year'))
-
   if not Year1:
     Year1 = max(Db.Extract('Year'))
-
   YBins = np.arange(Year0, Year1+Delta, Delta)
 
   ItL, ItD = Db.Occurrence(Code)
@@ -163,7 +165,7 @@ def TimePlot(Db, Code, Key=[], Year0=[], Year1=[], Delta=5, Threshold=0, OutFile
                       vmin=0,
                       vmax=np.max(Z))
 
-  plt.xticks(X,map(str,X), rotation='45')
+  plt.xticks(X, map(str,X), rotation='45')
   plt.yticks(Y+0.5, ItL, rotation='horizontal')
   plt.margins(0)
 
@@ -182,3 +184,106 @@ def TimePlot(Db, Code, Key=[], Year0=[], Year1=[], Delta=5, Threshold=0, OutFile
 
   if OutFile:
     plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+
+#-----------------------------------------------------------------------------------------
+
+def MagTimeHisto(Db, Mag0=[], Mag1=[], Bin=0.5,
+                     Year0=[], Year1=[], Delta=5,
+                     OutFile=[]):
+
+  if not Mag0:
+    Mag0 = min(Db.Extract('MagSize'))
+  if not Mag1:
+    Mag1 = max(Db.Extract('MagSize'))
+  MBins = np.arange(Mag0, Mag1+Bin, Bin)
+
+  if not Year0:
+    Year0 = min(Db.Extract('Year'))
+  if not Year1:
+    Year1 = max(Db.Extract('Year'))
+  YBins = np.arange(Year0, Year1+Delta, Delta)
+
+  plt.figure(figsize=(8, 4))
+
+  for C,MB in enumerate(MBins):
+
+    DbM = Db.Filter('MagSize', MB, Opr='>=', Owrite=0)
+    YArray = DbM.Extract('Year')
+    YHist = np.histogram(YArray, YBins)[0]
+
+    Cnum = float(len(MBins))
+    C = (Cnum-C)/Cnum
+
+    X = YBins[:-1]
+    Y = YHist
+
+
+    if any(Y):
+      plt.bar(X, Y, Delta, color=[C,C,C],
+                           log=True,
+                           label=r'$\geq${0}'.format(MB))
+
+  plt.xticks(X, map(str,X), rotation='45')
+  plt.margins(0)
+
+  plt.gca().yaxis.tick_right()
+
+  plt.gca().xaxis.set_ticks_position('none')
+  plt.gca().yaxis.set_ticks_position('none')
+
+  plt.xlabel('Years', fontsize=14, fontweight='bold')
+  plt.ylabel('Nr. Events', fontsize=14, fontweight='bold')
+
+  plt.tight_layout()
+  plt.legend(loc=2)
+  plt.show(block=False)
+
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+
+#-----------------------------------------------------------------------------------------
+
+def MagTimePlot(Db, Mag0=[], Mag1=[],
+                    Year0=[], Year1=[],
+                    OutFile=[]):
+
+  if not Mag0:
+    Mag0 = min(Db.Extract('MagSize'))
+  if not Mag1:
+    Mag1 = max(Db.Extract('MagSize'))
+
+  if not Year0:
+    Year0 = min(Db.Extract('Year'))
+  if not Year1:
+    Year1 = max(Db.Extract('Year'))
+
+  Sel.MagRangeSelect(Db, Mag0, Mag1, Owrite=1)
+  Sel.TimeSelect(Db, Year0, Year1, Owrite=1)
+
+  X = Db.Extract('Year')
+  Y = Db.Extract('MagSize')
+
+  plt.figure(figsize=(8, 4))
+
+  plt.plot(X, Y, 'o',markersize=3,
+                  color=[0,0,0],
+                  markeredgecolor=[0,0,0],
+                  markeredgewidth=1.5)
+
+  plt.gca().yaxis.grid(color='0.',linestyle='-')
+  plt.gca().xaxis.grid(color='0.65',linestyle='--')
+
+  plt.gca().xaxis.set_ticks_position('none')
+  plt.gca().yaxis.set_ticks_position('none')
+
+  plt.xlabel('Years', fontsize=14, fontweight='bold')
+  plt.ylabel('Magnitude', fontsize=14, fontweight='bold')
+
+  plt.axis([Year0, Year1, Mag0, Mag1])
+  # plt.tight_layout()
+  plt.show(block=False)
+
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+
+
