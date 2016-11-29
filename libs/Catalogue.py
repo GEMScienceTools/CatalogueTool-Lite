@@ -248,14 +248,22 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Extract(self, Key=[]):
+  def Extract(self, Key=[], All=False):
 
     Group = CU.KeyGroup(Key)
 
     if Key == 'Id' or Key == 'Log':
       Values = [E[Key] for E in self.Events]
+
     else:
-      Values = [E[Group][0][Key] for E in self.Events]
+      if not All:
+        Values = [E[Group][0][Key] for E in self.Events if E[Group]]
+
+      else:
+        Values = []
+        for E in self.Events:
+          for I in E[Group]:
+            Values.append(I[Key])
 
     return Values
 

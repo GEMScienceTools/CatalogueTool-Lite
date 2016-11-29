@@ -144,7 +144,9 @@ class Database(Cat.Database):
       if CmtStr:
         # Hanks & Kanamori equation
         Moment = float(CmtStr[49:56])*(10.**E)
-        M['MagSize'] = ((2./3.)*mt.log10(Moment))-10.7
+        Mw = ((2./3.)*mt.log10(Moment))-10.7
+
+        M['MagSize'] = float(format(Mw,'.2f'))
         M['MagType'] = 'MW'
         M['MagError'] = 0.
         M['MagCode'] = 'GCMT-NDK'
