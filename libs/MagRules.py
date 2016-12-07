@@ -246,7 +246,7 @@ def mb_Mw_NEIC_Weatherill2016(MagSize, MagError):
 
 def Ml_Mw_Edwards2010(MagSize, MagError):
   """
-  Ploynomial
+  Polynomial
   """
 
   if MagSize <= 6.0:

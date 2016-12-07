@@ -68,9 +68,9 @@ def GetMagnitudePair(Db, Code1, Code2):
 def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
   if Code in ['Magnitude','Mag','M']:
-    ItL, ItD = Db.Occurrence('MagCode')
+    ItL, ItD = Db.KeyStat('MagCode')
   elif Code in ['Location','Loc','L']:
-    ItL, ItD = Db.Occurrence('LocCode')
+    ItL, ItD = Db.KeyStat('LocCode')
   else:
     print 'Error: No valid code'
     return
@@ -98,7 +98,7 @@ def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
       if Code in ['Magnitude','Mag','M']:
         DbC = Db.Filter('MagCode',It,Owrite=False)
-        MaL, MaD = DbC.Occurrence('MagType')
+        MaL, MaD = DbC.KeyStat('MagType')
 
         StrLog += ' | Types:'
         for Ma in MaL:
@@ -132,7 +132,7 @@ def KeyTimeHisto(Db, Code, Key=[],
     Year1 = max(Db.Extract('Year'))
   YBins = np.arange(Year0, Year1+Delta, Delta)
 
-  ItL, ItD = Db.Occurrence(Code)
+  ItL, ItD = Db.KeyStat(Code)
 
   # Filter by threshold
   ItL = [K for K in ItL if ItD[K] > Threshold]

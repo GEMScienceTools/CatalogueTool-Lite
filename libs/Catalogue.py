@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2010-2016 GEM Foundation
@@ -9,13 +10,17 @@
 #
 # CATK is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
 # with this download. If not, see <http://www.gnu.org/licenses/>
 #
 # Author: Poggi Valerio
+
+"""
+Module for Earthquake Catalogue Storage and Manipulation.
+"""
 
 import math as ma
 import copy as cp
@@ -27,6 +32,34 @@ import CatUtils as CU
 #-----------------------------------------------------------------------------------------
 
 class Database(object):
+  """
+  EARTHQUAKE CATALOGUE DATABASE OBJECT
+  Initialisation parameters:
+    Name [str, Optional] = Catalogue identifier string
+    Info [str, Optional] = Additional catalogue information
+  Attributes:
+    .Header [dict] = Container for catalogue information
+    .Events [list] = Container for earthquake events
+  Methods:
+    .AddEvent = Add an earthquake event to the database
+    .DelEvent = Remove an earthquake avent from the database
+    .Import = Import catalogue from file (csv format)
+    .Export = Export catalogue to file (csv format)
+    .Load = Import database structure from binary file (cPickle compressed)
+    .Dump = Exprot database structure to binary file (cPickle compressed)
+    .Filter = Filter earthquake events by key field and rule
+    .Extract = Extract database information by key field
+    .KeyStat = Compute statistics on key field occurrence
+    .Copy = Create hardcopy of the database
+    .Append = Concatenate event list of two databases
+    .Size = Output number of earthquake events
+    .Print = Print event information on screen (by ID or index)
+    .Sort = Sort events according to origin time
+  [to check]:
+    .SetField = Set database key field to a value
+    .GetIndex = Get event index from ID string
+    .SetID = Regenerate event ID list
+  """
 
   def __init__(self, Name=[], Info=[]):
 
@@ -47,33 +80,25 @@ class Database(object):
     Event['Magnitude'] = []
 
     if Location:
-
       if type(Location) is dict:
         Location = [Location]
-
       for L in Location:
         Event['Location'].append(CU.LocationInit())
         for K in L.keys():
           Event['Location'][-1][K] = CU.CastValue(K, L[K])
 
     if Magnitude:
-
       if type(Magnitude) is dict:
         Magnitude = [Magnitude]
-
       for M in Magnitude:
         Event['Magnitude'].append(CU.MagnitudeInit())
         for K in M.keys():
           Event['Magnitude'][-1][K] = CU.CastValue(K, M[K])
 
     if not Append:
-
       self.Events.append(Event)
-
     else:
-
       I = self.GetIndex(Id)
-
       if I != []:
         self.Events[I]['Location'] += Event['Location']
         self.Events[I]['Magnitude'] += Event['Magnitude']
@@ -96,86 +121,75 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def GetIndex(self, Id):
+  def Import(self, FileName, Header=[],
+                             Delimiter=',',
+                             SkipLine=0,
+                             Comment='#'):
 
-    try:
-      I = [E['Id'] for E in self.Events].index(Id)
-    except:
-      I = []
+    tab = AT.AsciiTable()
+    tab.Import(FileName, header=Header,
+                         delimiter=Delimiter,
+                         skipline=SkipLine,
+                         comment=Comment,
+                         dtype='s')
 
-    return I
-
-  #---------------------------------------------------------------------------------------
-
-  def PrintEvent(self, I):
-
-    if CU.IsType(I, 's'):
-      I = self.GetIndex(I)
-
-    if I != []:
-      E = self.Events[I]
-
-      print 'Event Id: {0}'.format(E['Id'])
-      print 'Location:'
-
-      for n, L in enumerate(E['Location']):
-        print '[{0}] -'.format(n),
-        print 'Year: {0}'.format(L['Year']),
-        print 'Month: {0}'.format(L['Month']),
-        print 'Day: {0}'.format(L['Day']),
-        print 'Hour: {0}'.format(L['Hour']),
-        print 'Minute: {0}'.format(L['Minute']),
-        print 'Second: {0}'.format(L['Second']),
-        print 'Latitude: {0}'.format(L['Latitude']),
-        print 'Longitude: {0}'.format(L['Longitude']),
-        print 'Depth: {0}'.format(L['Depth']),
-        print 'Agency: {0}'.format(L['LocCode']),
-        print 'Prime: {0}'.format(L['Prime'])
-
-      print 'Magnitude:'
-      for m, M in enumerate(E['Magnitude']):
-        print '[{0}] -'.format(m),
-        print 'Type: {0}'.format(M['MagType']),
-        print 'Size: {0}'.format(M['MagSize']),
-        print 'Error: {0}'.format(M['MagError']),
-        print 'Agency: {0}'.format(M['MagCode'])
-
-      print 'Log:'
-      print '{0}'.format(E['Log'])
-
-    else:
-      print 'Warning: Event not found'
+    for D in tab.data:
+      L = CU.LocationInit()
+      M = CU.MagnitudeInit()
+      for K in tab.header:
+        if K in L:
+          L[K] = D[K]
+        if K in M:
+          M[K] = D[K]
+      self.AddEvent(D['Id'], L, M)
 
   #---------------------------------------------------------------------------------------
 
-  def Size(self):
+  def Export(self, FileName):
 
-    return len(self.Events)
+    tab = AT.AsciiTable()
 
-  #---------------------------------------------------------------------------------------
-
-  def SetKey(self, Key, Value, Match=[]):
-
-    Group = CU.KeyGroup(Key)
+    tab.header = ['Id','Year','Month','Day','Hour','Minute','Second',
+                  'Latitude','Longitude','Depth',
+                  'SecError','LatError','LonError','DepError',
+                  'LocCode','MagSize','MagError','MagType','MagCode','Log']
 
     for E in self.Events:
-      for P in E[Group]:
+      Data = [E['Id']]
+      for Key in tab.header[1:-1]:
+        Grp = CU.KeyGroup(Key)
+        Data.append(E[Grp][0][Key])
+      Data.append(E['Log'])
+      tab.AddElement(Data)
 
-        if Match and (P[Match[0]] == Match[1]):
-          P[Key] = CU.CastValue(Key, Value)
-
-        if not Match:
-          P[Key] = CU.CastValue(Key, Value)
+    tab.Export(FileName)
 
   #---------------------------------------------------------------------------------------
 
-  def SetID(self, Str0='', Str1=''):
+  def Load(self, FileName):
 
-    LZ = len(str(self.Size()))
+    with open(FileName, 'rb') as f:
+      C = pk.load(f)
+      self.Header = C[0]
+      self.Events = C[1]
+      f.close()
+      return
 
-    for I, E in enumerate(self.Events):
-      E['Log'] += 'PREID({0});'.format(E['Id'])
-      E['Id'] = Str0+str(I).zfill(LZ)+Str1
+    # Warn user if model file does not exist
+    print 'Warning: Cannot open file'
+
+  #---------------------------------------------------------------------------------------
+
+  def Dump(self, FileName):
+
+    with open(FileName, 'wb') as f:
+      C = (self.Header, self.Events)
+      pk.dump(C, f, protocol=2)
+      f.close()
+      return
+
+    # Warn user if model file does not exist
+    print 'Warning: Cannot open file'
 
   #---------------------------------------------------------------------------------------
 
@@ -193,7 +207,6 @@ class Database(object):
 
       for V in Value:
         for E in Event[Str0]:
-
           if (Opr == '=') and (E[Key] == V):
               NewE[Str0].append(E)
           if (Opr == '!=') and (E[Key] != V):
@@ -227,13 +240,10 @@ class Database(object):
     Group = CU.KeyGroup(Key)
 
     for E in self.Events:
-
       if Group == 'Location':
         E, Klist = Search(E, Value, 'Location', 'Magnitude', Opr, Best)
-
       if Group == 'Magnitude':
         E, Klist = Search(E, Value, 'Magnitude', 'Location', Opr, Best)
-
       if E['Location'] or E['Magnitude']:
         if All:
           if sorted(Value) == sorted(set(Klist)):
@@ -254,11 +264,9 @@ class Database(object):
 
     if Key == 'Id' or Key == 'Log':
       Values = [E[Key] for E in self.Events]
-
     else:
       if not All:
         Values = [E[Group][0][Key] for E in self.Events if E[Group]]
-
       else:
         Values = []
         for E in self.Events:
@@ -269,10 +277,9 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Occurrence(self, Key, Verbose=False):
+  def KeyStat(self, Key, Verbose=False):
 
     ItemList = []
-
     Group = CU.KeyGroup(Key)
 
     for E in self.Events:
@@ -309,11 +316,16 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
+  def Size(self):
+
+    return len(self.Events)
+
+  #---------------------------------------------------------------------------------------
+
   def Sort(self):
 
     Sec = []
     for E in self.Events:
-
       L = E['Location'][0]
       S = CU.DateToSec(L['Year'],
                        L['Month'],
@@ -334,108 +346,72 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Import(self, FileName, Header=[],
-                             Delimiter=',',
-                             SkipLine=0,
-                             Comment='#'):
+  def Print(self, I):
 
-    tab = AT.AsciiTable()
-    tab.Import(FileName, header=Header,
-                         delimiter=Delimiter,
-                         skipline=SkipLine,
-                         comment=Comment,
-                         dtype='s')
+    if CU.IsType(I, 's'):
+      I = self.GetIndex(I)
 
-    for D in tab.data:
+    if I != []:
+      E = self.Events[I]
 
-      L = CU.LocationInit()
-      M = CU.MagnitudeInit()
+      print 'Event Id: {0}'.format(E['Id'])
+      print 'Location:'
+      for n, L in enumerate(E['Location']):
+        print '[{0}] -'.format(n),
+        print 'Year: {0}'.format(L['Year']),
+        print 'Month: {0}'.format(L['Month']),
+        print 'Day: {0}'.format(L['Day']),
+        print 'Hour: {0}'.format(L['Hour']),
+        print 'Minute: {0}'.format(L['Minute']),
+        print 'Second: {0}'.format(L['Second']),
+        print 'Latitude: {0}'.format(L['Latitude']),
+        print 'Longitude: {0}'.format(L['Longitude']),
+        print 'Depth: {0}'.format(L['Depth']),
+        print 'Agency: {0}'.format(L['LocCode']),
+        print 'Prime: {0}'.format(L['Prime'])
+      print 'Magnitude:'
+      for m, M in enumerate(E['Magnitude']):
+        print '[{0}] -'.format(m),
+        print 'Type: {0}'.format(M['MagType']),
+        print 'Size: {0}'.format(M['MagSize']),
+        print 'Error: {0}'.format(M['MagError']),
+        print 'Agency: {0}'.format(M['MagCode'])
+      print 'Log:'
+      print '{0}'.format(E['Log'])
 
-      for K in tab.header:
-        if K in L:
-          L[K] = D[K]
-        if K in M:
-          M[K] = D[K]
-
-      self.AddEvent(D['Id'], L, M)
-
-  #---------------------------------------------------------------------------------------
-
-  def Export(self, FileName):
-
-    tab = AT.AsciiTable()
-
-    tab.header = ['Id',
-                  'Year',
-                  'Month',
-                  'Day',
-                  'Hour',
-                  'Minute',
-                  'Second',
-                  'Latitude',
-                  'Longitude',
-                  'Depth',
-                  'SecError',
-                  'LatError',
-                  'LonError',
-                  'DepError',
-                  'LocCode',
-                  'MagSize',
-                  'MagError',
-                  'MagType',
-                  'MagCode',
-                  'Log']
-
-    for Id, E in enumerate(self.Events):
-      Data = [E['Id'],
-              E['Location'][0]['Year'],
-              E['Location'][0]['Month'],
-              E['Location'][0]['Day'],
-              E['Location'][0]['Hour'],
-              E['Location'][0]['Minute'],
-              E['Location'][0]['Second'],
-              E['Location'][0]['Latitude'],
-              E['Location'][0]['Longitude'],
-              E['Location'][0]['Depth'],
-              E['Location'][0]['SecError'],
-              E['Location'][0]['LatError'],
-              E['Location'][0]['LonError'],
-              E['Location'][0]['DepError'],
-              E['Location'][0]['LocCode'],
-              E['Magnitude'][0]['MagSize'],
-              E['Magnitude'][0]['MagError'],
-              E['Magnitude'][0]['MagType'],
-              E['Magnitude'][0]['MagCode'],
-              E['Log']]
-
-      tab.AddElement(Data)
-
-    tab.Export(FileName)
+    else:
+      print 'Warning: Event not found'
 
   #---------------------------------------------------------------------------------------
 
-  def Dump(self, FileName):
+  def SetField(self, Key, Value, Match=[]):
 
-    with open(FileName, 'wb') as f:
-      C = (self.Header, self.Events)
-      pk.dump(C, f, protocol=2)
-      f.close()
-      return
+    Group = CU.KeyGroup(Key)
 
-    # Warn user if model file does not exist
-    print 'Warning: Cannot open file'
+    for E in self.Events:
+      for P in E[Group]:
+        if Match and (P[Match[0]] == Match[1]):
+          P[Key] = CU.CastValue(Key, Value)
+        if not Match:
+          P[Key] = CU.CastValue(Key, Value)
 
   #---------------------------------------------------------------------------------------
 
-  def Load(self, FileName):
+  def GetIndex(self, Id):
 
-    with open(FileName, 'rb') as f:
-      C = pk.load(f)
-      self.Header = C[0]
-      self.Events = C[1]
-      f.close()
-      return
+    try:
+      I = [E['Id'] for E in self.Events].index(Id)
+    except:
+      I = []
 
-    # Warn user if model file does not exist
-    print 'Warning: Cannot open file'
+    return I
 
+  #---------------------------------------------------------------------------------------
+
+  def SetID(self, Str0='', Str1=''):
+
+    LZ = len(str(self.Size()))
+
+    for I, E in enumerate(self.Events):
+      E['Log'] += 'PREID({0});'.format(E['Id'])
+      E['Id'] = Str0+str(I).zfill(LZ)+Str1
