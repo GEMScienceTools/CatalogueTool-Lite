@@ -1,6 +1,7 @@
 # CatalogueTool-Lite
 A simplified toolkit for earthquake catalogue handling
-## 1 - Main Catalogue Object
+
+## 1 - Module Catalogue
 A catalogue object can be instanciated using the *Database* class in the *Catalogue* library:
 ~~~
 import Catalogue as Cat
