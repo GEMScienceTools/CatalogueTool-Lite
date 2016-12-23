@@ -124,6 +124,13 @@ Identically, the catalogue object can be exported in csv standar format with:
 ~~~python
 Db.Export('data/isc-rev-africa-select.csv')
 ~~~
-Only limitation of the standard CATK format is that only one solution is possible per even, when reading and writing a file. To avoid this problem, ISF format can be used instead (see parser module).
+Only limitation of the standard CATK format is that only one solution is possible per event, either when reading and writing a file. To avoid this problem, ISF format can be used instead (see parser module).
 
 #### 1.3.3 - Reading Writing Binary Files
+To speed up I/O access to database information when storing catalogue objects on disk for subsequent use, binary (CPickle) files can be used. This can be done simply with:
+~~~python
+# Writing to binary
+Db.Dump('data/isc-gem-v3.bin')
+# Reading from binary
+Db.Load('data/isc-gem-v3.bin')
+~~~
