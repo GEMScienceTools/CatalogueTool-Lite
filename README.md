@@ -64,7 +64,9 @@ Several methods for database manipulation, I/O and exploration are available:
 
 ### 1.3 - Catalogue I/O
 Once instantiated an catalogue object, the database can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
-For example, database items can be created manually in these ways:
+
+#### 1.3.1 - Crating a Catalogue Manually
+As an example, database items can be created manually in these ways:
 ~~~python
 import Catalogue as Cat
 Db = Cat.Database('MyCat')
@@ -92,6 +94,8 @@ Db.AddEvent('E002', Magnitude=M, Append=True)
 Db.DelEvent('E003')
 ~~~
 Providing all key fields is not compulsory. The *AddEvent* method will only include the available information.
+
+#### 1.3.2 - Reading/Writing ASCII Files
 Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form:
 
 | Id | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude | Depth | DepError | LocCode | MagSize | MagError | MagType | MagCode |
@@ -104,7 +108,7 @@ A standard csv catalogue can then be parsed using the method *Import*:
 ~~~python
 Db.Import('data/isc-rev-africa-select.csv')
 ~~~
-Also non standard csv formats can be parsed, by manually specifying which header information to be read. For example:
+Non-standard csv formats can also be parsed, by manually specifying which header information to be read (and which not). For example:
 ~~~python
 H = ['Id','','Year','Month','Day','Hour','Minute','Second',
      'Longitude','Latitude','','','','Depth','DepError',
@@ -115,3 +119,11 @@ Db.Import('data/isc-gem-v3.csv',Header=H,
                                 SkipLine=1,
                                 Delimiter=',')
 ~~~
+
+Identically, the catalogue object can be exported in csv standar format with:
+~~~python
+Db.Export('data/isc-rev-africa-select.csv')
+~~~
+Only limitation of the standard CATK format is that only one solution is possible per even, when reading and writing a file. To avoid this problem, ISF format can be used instead (see parser module).
+
+#### 1.3.3 - Reading Writing Binary Files
