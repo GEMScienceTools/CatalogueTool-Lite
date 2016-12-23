@@ -16,7 +16,7 @@ Each element of the *Events* list is practically a dictionary containing data of
 Here is an example:
 ~~~python
 Db.Events[0] = {'Id': '02000',
-                'Location': [{'LocCode': 'ISC',  <<-- First Lcoation Solution
+                'Location': [{'LocCode': 'ISC',  # First Lcoation Solution
                               'Year': 1972,
                               'Month': 1,
                               'Day': 19,
@@ -31,11 +31,11 @@ Db.Events[0] = {'Id': '02000',
                               'DepError': None,
                               'SecError': 0.35,
                               'Prime': True}],
-                'Magnitude': [{'MagCode': 'EMEC',  <<-- First Magnitude Solution
+                'Magnitude': [{'MagCode': 'EMEC',  # First Magnitude Solution
                                'MagSize': 5.0,
                                'MagError': None,
                                'MagType': 'Mw'},
-                               {'MagCode': 'ISC',  <<-- Second Magnitude Solution
+                               {'MagCode': 'ISC',  # Second Magnitude Solution
                                'MagSize': 4.9,
                                'MagError': 0.1,
                                'MagType': 'Ms'}],
