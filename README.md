@@ -25,7 +25,7 @@ Each element of the *Events* list is practically a dictionary containing data of
                'LonError': None,
                'DepError': None,
                'SecError': 0.35,
-               'Prime': True],
+               'Prime': True}],
  'Magnitude': [{'MagCode': 'EMEC',
                 'MagSize': 5.0,
                 'MagError': None,
@@ -33,9 +33,27 @@ Each element of the *Events* list is practically a dictionary containing data of
                 {'MagCode': 'ISC',
                 'MagSize': 4.9,
                 'MagError': 0.1,
-                'MagType': 'Ms'},],
+                'MagType': 'Ms'}],
  'Log': 'MERGED(EMEC Africa:1234);PREID(1111);'}
 ~~~
 *Location* and *Magnitude* are also list of dictionaries. Each elements of the list represents a separate solution from a particular agency. *Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
 In the example above, the event 02000 contains two independent magnitude solutions, but only one location solution.
 ### 1.2 - Methods
+Several methods for database manipulation, I/O and exploration are available:
+  * *AddEvent* - Add an earthquake event to the database
+  * *DelEvent* - Remove an earthquake avent from the database
+  * *Import* - Import catalogue from file (csv format)
+  * *Export* - Export catalogue to file (csv format)
+  * *Load* - Import database structure from binary file (cPickle compressed)
+  * *Dump* - Exprot database structure to binary file (cPickle compressed)
+  * *Filter* - Filter earthquake events by key field and rule
+  * *Extract* - Extract database information by key field
+  * *KeyStat* - Compute statistics on key field occurrence
+  * *Copy* - Create hardcopy of the database
+  * *Append* - Concatenate event list of two databases
+  * *Size* - Output number of earthquake events
+  * *Print* - Print event information on screen (by ID or index)
+  * *Sort* - Sort events according to origin time
+  * *SetField* - Set database key field to a specific value
+  * *GetIndex* - Get event index from ID string
+  * *SetID* - Regenerate progressive IDs
