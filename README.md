@@ -6,6 +6,7 @@ A catalogue object can be instanciated using the *Database* class in the *Catalo
 import Catalogue as Cat
 Db0 = Cat.Database('Some Name (Optional)','Some Information (Optional)')
 ~~~
+
 ### 1.1 - Attributes
 The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
 Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *location* and *Log*:
@@ -38,6 +39,7 @@ Each element of the *Events* list is practically a dictionary containing data of
 ~~~
 *Location* and *Magnitude* are also list of dictionaries. Each elements of the list represents a separate solution from a particular agency. *Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
 In the example above, the event 02000 contains two independent magnitude solutions, but only one location solution.
+
 ### 1.2 - Methods
 Several methods for database manipulation, I/O and exploration are available:
   * *AddEvent* - Add an earthquake event to the database
@@ -57,6 +59,7 @@ Several methods for database manipulation, I/O and exploration are available:
   * *SetField* - Set database key field to a specific value
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
+
 ### 1.3 - Catalogue I/O
 Once instantiated an Database object, the catalogue can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
 For example, database items can be created in this way:
