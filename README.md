@@ -1,16 +1,5 @@
 # CatalogueTool-Lite
 A simplified toolkit for earthquake catalogue handling
-<<<<<<< HEAD
-
-## Main Catalogue Object
-A catalogue database object is instanciated with:
-~~~
-import Catalogue as Cat
-Db0 = Cat.Database('Some Name (Optional)')
-~~~
-The most important attributes of the catalogue objects are the *header* and the *events* variables. While *header* contains general information about the catalogue itself (e.g. name, descrition...), *events* is the actual database of earthquake records, in the form of a list.
-Each element of the *events* list is a dictionary containing data of an single event, grouped by key: *Id*, *Magnitude*, *location* and *Log*:
-=======
 ## 1 - Main Catalogue Object
 A catalogue object can be instanciated using the *Database* class in the *Catalogue* library:
 ~~~
@@ -20,7 +9,6 @@ Db0 = Cat.Database('Some Name (Optional)','Some Information (Optional)')
 ### 1.1 - Attributes
 The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
 Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *location* and *Log*:
->>>>>>> 767076999019c2dea5b308e6b590b92ef01f0d76
 ~~~
 {'Id': '02000',
  'Location': [{'LocCode': 'ISC',
@@ -37,16 +25,6 @@ Each element of the *Events* list is practically a dictionary containing data of
                'LonError': None,
                'DepError': None,
                'SecError': 0.35,
-<<<<<<< HEAD
-               'Prime': True],
- 'Magnitude': [{'MagCode': 'EMEC',
-                'MagSize': 5.0,
-                'MagError': None,
-                'MagType': 'Mw'}],
- 'Log': 'MERGED(EMEC Africa:116218);PREID(777017);'}
-~~~
-*Location* and *Magnitude* are then list of dictionaries. Each elements of the list represents a separate solution from a particular agency. *Log* is a container for processing information, although it can be used to store any arbitrary etxt data.
-=======
                'Prime': True}],
  'Magnitude': [{'MagCode': 'EMEC',
                 'MagSize': 5.0,
@@ -79,4 +57,3 @@ Several methods for database manipulation, I/O and exploration are available:
   * *SetField* - Set database key field to a specific value
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
->>>>>>> 767076999019c2dea5b308e6b590b92ef01f0d76
