@@ -1,34 +1,32 @@
 """
-EXAMPLE 1 - MANUAL BUILD OF A DATABASE
+EXAMPLE 1 - MANUAL CREATION OF A CATALOGUE DATABASE
 """
 
 import Catalogue as Cat
-
-Db = Cat.Database('First Test','Just a test')
+Db = Cat.Database('First Test','NOTE: Just a test')
 
 L = [{'Year': 1960},
-     {'Year': 1961, 'Month': 12},
+     {'Year': 1961, 'Month': 12, 'Latitude': 10., 'Longitude': 20.},
      {'Year': 1962, 'Month': 12, 'Day': 3, 'Hour': 5, 'Minute': 20, 'Second': 10}]
 
 M = [{'MagCode': 'AAA', 'MagSize':5, 'MagError': 0.1, 'MagType':'Mw'},
      {'MagCode': 'XXX', 'MagSize':7, 'MagError': 0.2, 'MagType':'ML'}]
 
-Db.AddEvent('E1')
-Db.AddEvent('E2', L)
-Db.AddEvent('E3', L, M)
+# Creating an new empty catalogue item
+Db.AddEvent('E001')
 
-Db.AddEvent('E1', L, [], Append=True)
-Db.AddEvent('E2', Magnitude=M, Append=True)
+# Creating a new item with just Location information
+Db.AddEvent('E002', Location=L)
 
-Db.DelEvent('E3')
+# Creating a new item with Location and Magnitude information
+Db.AddEvent('E003', Location=L, Magnitude=M)
 
-Db.SetKey('LocCode', 'ZZZ')
-Db.SetKey('Prime', True, Match=['LocCode','ZZZ'])
+# Adding new information to an existing item
+Db.AddEvent('E001', L, [], Append=True)
+Db.AddEvent('E002', Magnitude=M, Append=True)
 
-Db.PrintEvent('E2')
-Db.Size()
+# Remove an existing item (by ID)
+Db.DelEvent('E003')
 
-I = Db.GetIndex('E2')
-
-print Db.Header
-print Db.Events[I]
+# Visualize item information
+Db.Print('E002')

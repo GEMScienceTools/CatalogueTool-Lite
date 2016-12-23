@@ -56,9 +56,9 @@ class Database(object):
     .Print = Print event information on screen (by ID or index)
     .Sort = Sort events according to origin time
   [to check]:
-    .SetField = Set database key field to a value
+    .SetField = Set database key field to a specific value
     .GetIndex = Get event index from ID string
-    .SetID = Regenerate event ID list
+    .SetID = Regenerate progressive IDs
   """
 
   def __init__(self, Name=[], Info=[]):
