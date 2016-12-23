@@ -99,3 +99,19 @@ Manual creation of a large number of items is however impractical. To avoid that
 | 16957871 | 1905 | 9 | 8 | 1 | 43 | 2.24 | 15.7840 | 38.6360 | 15.00 | 6.70 | ISC-GEM | 7.16 | 0.70 | Mw | ISC-GEM |
 | 16957879 | 1905 | 12 | 4 | 12 | 20 | 7.96 | 38.8300 | 37.2160 | 15.00 | 5.60 | ISC-GEM | 5.56 | 0.63 | Mw | ISC-GEM |
 | 16958009 | 1908 | 12 | 28 | 4 | 20 | 26.62 | 15.3490 | 38.0000 | 15.00 | 6.00 | ISC-GEM | 7.03 | 0.37 | Mw | ISC-GEM |
+
+A standard csv catalogue can then be parsed using the method *Import*:
+~~~python
+Db.Import('data/isc-rev-africa-select.csv')
+~~~
+Also non standard csv formats can be parsed, by manually specifying which header information to be read. For example:
+~~~python
+H = ['Id','','Year','Month','Day','Hour','Minute','Second',
+     'Longitude','Latitude','','','','Depth','DepError',
+     'MagSize','MagError','','','','','','','','','']
+
+Db = Cat.Database('ISC-GEM')
+Db.Import('data/isc-gem-v3.csv',Header=H,
+                                SkipLine=1,
+                                Delimiter=',')
+~~~
