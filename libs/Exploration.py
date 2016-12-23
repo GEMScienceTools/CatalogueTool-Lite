@@ -257,11 +257,11 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   if not Year1:
     Year1 = max(Db.Extract('Year'))
 
-  Sel.MagRangeSelect(Db, Mag0, Mag1, Owrite=1)
-  Sel.TimeSelect(Db, Year0, Year1, Owrite=1)
+  DbS = Sel.MagRangeSelect(Db, Mag0, Mag1, Owrite=0)
+  DbS = Sel.TimeSelect(DbS, Year0, Year1, Owrite=0)
 
-  X = Db.Extract('Year')
-  Y = Db.Extract('MagSize')
+  X = DbS.Extract('Year')
+  Y = DbS.Extract('MagSize')
 
   plt.figure(figsize=(8, 4))
 
