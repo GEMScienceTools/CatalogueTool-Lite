@@ -11,7 +11,7 @@ Db0 = Cat.Database('Some Name (Optional)','Some Information (Optional)')
 The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
 Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *Location* and *Log*.
 Here is an example:
-~~~
+~~~python
 {'Id': '02000',
  'Location': [{'LocCode': 'ISC',
                'Year': 1972,
@@ -65,7 +65,7 @@ Several methods for database manipulation, I/O and exploration are available:
 ### 1.3 - Catalogue I/O
 Once instantiated an catalogue object, the database can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
 For example, database items can be created in this way:
-~~~
+~~~python
 import Catalogue as Cat
 Db = Cat.Database('MyCat')
 
@@ -75,7 +75,7 @@ L = [{'Year': 1961, 'Month': 12, 'Day': 3, 'Hour': 5, 'Minute': 20, 'Second': 10
 M = [{'MagCode': 'AAA', 'MagSize':5, 'MagError': 0.1, 'MagType':'Mw'},
      {'MagCode': 'BBB', 'MagSize':7, 'MagError': 0.2, 'MagType':'ML'}]
 
-# Creating an empty catalogue item
+# Creating an new empty catalogue item
 Db.AddEvent('E001')
 
 # Creating a new item with just Location information
@@ -88,7 +88,7 @@ Db.AddEvent('E003', Location=L, Magnitude=M)
 Db.AddEvent('E001', L, [], Append=True)
 Db.AddEvent('E002', Magnitude=M, Append=True)
 
-# Remove an existing items (by ID)
+# Remove an existing item (by ID)
 Db.DelEvent('E003')
 ~~~
 Using all fields

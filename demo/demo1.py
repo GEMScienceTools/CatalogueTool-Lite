@@ -12,7 +12,7 @@ L = [{'Year': 1960},
 M = [{'MagCode': 'AAA', 'MagSize':5, 'MagError': 0.1, 'MagType':'Mw'},
      {'MagCode': 'XXX', 'MagSize':7, 'MagError': 0.2, 'MagType':'ML'}]
 
-# Creating an empty catalogue item
+# Creating an new empty catalogue item
 Db.AddEvent('E001')
 
 # Creating a new item with just Location information
