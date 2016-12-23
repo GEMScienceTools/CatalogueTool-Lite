@@ -9,7 +9,8 @@ Db0 = Cat.Database('Some Name (Optional)','Some Information (Optional)')
 
 ### 1.1 - Attributes
 The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
-Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *location* and *Log*:
+Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *Location* and *Log*.
+Here is an example:
 ~~~
 {'Id': '02000',
  'Location': [{'LocCode': 'ISC',
@@ -37,8 +38,9 @@ Each element of the *Events* list is practically a dictionary containing data of
                 'MagType': 'Ms'}],
  'Log': 'MERGED(EMEC Africa:1234);PREID(1111);'}
 ~~~
-*Location* and *Magnitude* are also list of dictionaries. Each elements of the list represents a separate solution from a particular agency. *Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
-In the example above, the event 02000 contains two independent magnitude solutions, but only one location solution.
+As it can be seen from the example, *Location* and *Magnitude* are also list of dictionaries. Each elements of those lists represents a separate solution from a particular agency.
+*Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
+In the example above, the event *02000* contains two independent magnitude solutions, but only one location solution.
 
 ### 1.2 - Methods
 Several methods for database manipulation, I/O and exploration are available:
@@ -61,8 +63,32 @@ Several methods for database manipulation, I/O and exploration are available:
   * *SetID* - Regenerate progressive IDs
 
 ### 1.3 - Catalogue I/O
-Once instantiated an Database object, the catalogue can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
+Once instantiated an catalogue object, the database can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
 For example, database items can be created in this way:
 ~~~
+import Catalogue as Cat
+Db = Cat.Database('MyCat')
 
+L = [{'Year': 1961, 'Month': 12, 'Day': 3, 'Hour': 5, 'Minute': 20, 'Second': 10}},
+     {'Year': 1962, 'Month': 2, 'Day': 5, 'Hour': 12, 'Minute': 6, 'Second': 5}]
+
+M = [{'MagCode': 'AAA', 'MagSize':5, 'MagError': 0.1, 'MagType':'Mw'},
+     {'MagCode': 'BBB', 'MagSize':7, 'MagError': 0.2, 'MagType':'ML'}]
+
+# Creating an empty catalogue item
+Db.AddEvent('E001')
+
+# Creating a new item with just Location information
+Db.AddEvent('E002', Location=L)
+
+# Creating a new item with Location and Magnitude information
+Db.AddEvent('E003', Location=L, Magnitude=M)
+
+# Adding new information to an existing item
+Db.AddEvent('E001', L, [], Append=True)
+Db.AddEvent('E002', Magnitude=M, Append=True)
+
+# Remove an existing items (by ID)
+Db.DelEvent('E003')
 ~~~
+Using all fields

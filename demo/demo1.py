@@ -25,7 +25,7 @@ Db.AddEvent('E003', Location=L, Magnitude=M)
 Db.AddEvent('E001', L, [], Append=True)
 Db.AddEvent('E002', Magnitude=M, Append=True)
 
-# Remove an items (by ID)
+# Remove an existing item (by ID)
 Db.DelEvent('E003')
 
 # Visualize item information
