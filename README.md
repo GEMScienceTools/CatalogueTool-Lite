@@ -1,14 +1,14 @@
 # CatalogueTool-Lite
 A simplified toolkit for earthquake catalogue handling
 ## 1 - Main Catalogue Object
-A catalogue database object caan be instanciated using the *Catalogue* library:
+A catalogue object can be instanciated using the *Database* class in the *Catalogue* library:
 ~~~
 import Catalogue as Cat
-Db0 = Cat.Database('Some Name (Optional)')
+Db0 = Cat.Database('Some Name (Optional)','Some Information (Optional)')
 ~~~
 ### 1.1 - Attributes
-The most important attributes of the catalogue objects are the *header* and the *events* variables. While *header* is simply a list that contains general information about the catalogue itself (e.g. name, descrition...), *events* is the actual database (list) of earthquake records, and it has a more complex internal structure.
-Each element of the *events* list is practically a dictionary containing data of an single event, grouped by key: *Id*, *Magnitude*, *location* and *Log*:
+The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
+Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *location* and *Log*:
 ~~~
 {'Id': '02000',
  'Location': [{'LocCode': 'ISC',
@@ -36,6 +36,6 @@ Each element of the *events* list is practically a dictionary containing data of
                 'MagType': 'Ms'},],
  'Log': 'MERGED(EMEC Africa:1234);PREID(1111);'}
 ~~~
-*Location* and *Magnitude* are also list of dictionaries. Each elements of the list represents a separate solution from a particular agency. *Log* is a container for processing information (explained later), although it could be used to store any arbitrary text data.
-In the example above, the event contains two independent magnitude solutions, but only one location solution.
+*Location* and *Magnitude* are also list of dictionaries. Each elements of the list represents a separate solution from a particular agency. *Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
+In the example above, the event 02000 contains two independent magnitude solutions, but only one location solution.
 ### 1.2 - Methods
