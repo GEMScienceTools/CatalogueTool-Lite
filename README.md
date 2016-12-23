@@ -16,7 +16,7 @@ Each element of the *Events* list is practically a dictionary containing data of
 Here is an example:
 ~~~python
 Db.Events[0] = {'Id': '02000',
-                'Location': [{'LocCode': 'ISC',  # First Lcoation Solution
+                'Location': [{'LocCode': 'ISC',  # First Location Solution
                               'Year': 1972,
                               'Month': 1,
                               'Day': 19,
@@ -139,9 +139,21 @@ Db.Load('data/isc-gem-v3.bin')
 ~~~
 
 ### 1.3 - Catalogue Manipulation
-Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to specific rules. 
+Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to specific rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed, for example:
+~~~python
+# Keep only events with one or more ISC Location solutions
+Db.Filter('LocCode', 'ISC')
+~~~
+However inequality checks are also allowed, using the flag *Opr*:
+~~~python
+# Select magnitude equal or higher than 5
+Db.Filter('MagSize', 5, Opr='>=')
+# Remove unknown depth solutions
+Db.Filter('Depth', None, Opr='!=')
+~~~
 
-An hard-copy of a whole database object can be cerated using the method *Copy*:
+
+An hard-copy of a whole database object can be created using the method *Copy*:
 ~~~python
 DbNew = Db.Copy()
 ~~~
