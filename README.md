@@ -139,20 +139,35 @@ Db.Load('data/isc-gem-v3.bin')
 ~~~
 
 ### 1.3 - Catalogue Manipulation
+#### 1.3.1 - Event Selection
 Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to specific rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed, for example:
 ~~~python
 # Keep only events with one or more ISC Location solutions
 Db.Filter('LocCode', 'ISC')
+# Multiple values can also be provided
+Db.Filter('LocCode', ['ISC',GCMT','NEIC'])
 ~~~
-However inequality checks are also allowed, using the flag *Opr*:
+However inequality checks are also allowed, by specifying the argument *Opr*:
 ~~~python
 # Select magnitude equal or higher than 5
 Db.Filter('MagSize', 5, Opr='>=')
 # Remove unknown depth solutions
 Db.Filter('Depth', None, Opr='!=')
 ~~~
+Combination of the arguments *All* and *Best* can be used to perform conditional selection. *All* is used to select items which contain all values in the list (equivalent to booleand *and*). This is often the case when we want to compare all earthquake events with multiple solutions from different agencies:
+~~~python
+Db.Filter('LocCode', ['ISC',GCMT'],All=True)
+~~~
+*Best*, on the contrary, selects items with any occurence of the first element of the list. If not present, it searches for a match with the second element and so on (equivalent to boolean *or*):
+~~~python
+Db.Filter('LocCode', ['ISC',GCMT'],Best=True)
+~~~
+By default, the method remove items from the database of the object permanently. To avoid this, an hard-copy of the object can be created in output:
+~~~python
+DbNew = Db.Filter('LocCode', ['ISC',GCMT'], Owrite=True)
+~~~
 
-
+#### 1.3.2 - Others
 An hard-copy of a whole database object can be created using the method *Copy*:
 ~~~python
 DbNew = Db.Copy()
