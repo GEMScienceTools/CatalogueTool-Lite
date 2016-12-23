@@ -57,3 +57,9 @@ Several methods for database manipulation, I/O and exploration are available:
   * *SetField* - Set database key field to a specific value
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
+### 1.3 - Catalogue I/O
+Once instantiated an Database object, the catalogue can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
+For example, database items can be created in this way:
+~~~
+
+~~~
