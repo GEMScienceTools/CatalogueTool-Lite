@@ -99,7 +99,7 @@ Db.DelEvent('E003')
 Providing all key fields is not compulsory. The *AddEvent* method will only include the available information.
 
 #### 1.2.2 - Reading/Writing ASCII Files
-Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form:
+Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form (header keywords are self-explanatory):
 
 | Id | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude | Depth | DepError | LocCode | MagSize | MagError | MagType | MagCode |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -145,26 +145,23 @@ Probably, the most important and widely used method is *Filter*, which allows re
 # Keep only events with one or more ISC Location solutions
 Db.Filter('LocCode', 'ISC')
 # Multiple values can also be provided
-Db.Filter('LocCode', ['ISC',GCMT','NEIC'])
+Db.Filter('LocCode', ['ISC','GCMT','NEIC'])
 ~~~
-However inequality checks are also allowed, by specifying the argument *Opr*:
+Inequality checks are also allowed, by specifying the argument *Opr*:
 ~~~python
 # Select magnitude equal or higher than 5
 Db.Filter('MagSize', 5, Opr='>=')
 # Remove unknown depth solutions
 Db.Filter('Depth', None, Opr='!=')
 ~~~
-Combination of the arguments *All* and *Best* can be used to perform conditional selection. *All* is used to select items which contain all values in the list (equivalent to booleand *and*). This is often the case when we want to compare all earthquake events with multiple solutions from different agencies:
+Combination of the arguments *All* and *Best* can be used to perform conditional selection. *All* is used to select items which contain all values in the list (equivalent to booleand *and*). This is often the case when we want to compare all earthquake events with multiple solutions from different agencies. *Best*, on the contrary, selects items with any occurence of the first element of the list. If not present, it searches for a match with the second element and so on (equivalent to boolean *or*):
 ~~~python
-Db.Filter('LocCode', ['ISC',GCMT'],All=True)
+Db.Filter('LocCode', ['ISC','GCMT'], All=True)
+Db.Filter('LocCode', ['ISC','GCMT'], Best=True)
 ~~~
-*Best*, on the contrary, selects items with any occurence of the first element of the list. If not present, it searches for a match with the second element and so on (equivalent to boolean *or*):
+By default, the method remove items from the database of the object permanently. To avoid this, an hard-copy of the object can be created in output by using the argument *Owrite*:
 ~~~python
-Db.Filter('LocCode', ['ISC',GCMT'],Best=True)
-~~~
-By default, the method remove items from the database of the object permanently. To avoid this, an hard-copy of the object can be created in output:
-~~~python
-DbNew = Db.Filter('LocCode', ['ISC',GCMT'], Owrite=True)
+DbNew = Db.Filter('LocCode', ['ISC','GCMT'], Owrite=True)
 ~~~
 
 #### 1.3.2 - Others
