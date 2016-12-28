@@ -2,13 +2,13 @@
 *A simplified Python toolkit for earthquake catalogue manipulation*
 
 The toolkit consists of 9 main modules:
-  * **Catalogue** - The main module for database creation
+  * **Catalogue** - The main module for database creation an I/O
   * **Parsers** - A collection of ad-hoc parsers for specific catalogues and bulletins (ISC, GCMT...)
   * **Selection** - Functions for high-level manipulation of earthquake databases
   * **Exploration** - Functions to explore database information and statistical analysis
   * **Regressor** - Utilities for magnitude conversion homogenisation
   * **MagRules** - Library of magnitude conversion functions
-  * **MapTools** - Utility to plot the earthquake database on a map
+  * **MapTools** - Utility to plot earthquake databases on a map
   * **IscWeb** - API to download isf catalogues from the ISC web
   * **IscCode** - ISC agency code list
 
@@ -25,8 +25,8 @@ Optional parameters are the catalogue name and a description string.
 ### 1.2 - Object Structure
 
 #### 1.2.1 - Attributes
-The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
-Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *Location* and *Log*.
+The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary storing general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (a list) of earthquake records and a more complex internal structure.
+Each element of the *Events* list is in fact a dictionary containing data of a single event, grouped by four main keys: *Id*, *Magnitude*, *Location* and *Log*.
 Here is an example:
 ~~~python
 Db.Events[0] = {'Id': '02000',
@@ -56,7 +56,7 @@ Db.Events[0] = {'Id': '02000',
                 'Log': 'MERGED(EMEC Africa:1234);PREID(1111);'}
 ~~~
 As it can be seen from the example, *Location* and *Magnitude* are also list of dictionaries. Each elements of those lists represents a separate solution from a particular agency.
-*Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
+*Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data of an event.
 In the example above, the event *02000* contains two independent magnitude solutions, but only one location solution.
 
 #### 1.2.2 - Methods
@@ -78,12 +78,13 @@ Several methods for database manipulation, I/O and exploration are available:
   * *SetField* - Set database key field to a specific value
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
+These methods are grouped in four main categories, we are described in the following.
 
 ### 1.3 - Catalogue I/O
-Once instantiated an catalogue object, the database can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
+Once instantiated an catalogue object, the database can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue, however, can also be manually augmented with new available information.
 
 #### 1.3.1 - Creating a Catalogue Manually
-As an example, database items can be created manually in these ways:
+As an example, database items can be created manually in this way:
 ~~~python
 import Catalogue as Cat
 Db = Cat.Database('MyCat')
@@ -113,7 +114,7 @@ Db.DelEvent('E003')
 Providing all key fields is not compulsory. The *AddEvent* method will only include the available information.
 
 #### 1.3.2 - Reading/Writing ASCII Files
-Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form (header keywords are self-explanatory):
+Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form (header keywords should be self-explanatory):
 
 | Id | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude | Depth | DepError | LocCode | MagSize | MagError | MagType | MagCode |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -125,7 +126,7 @@ A standard csv catalogue can then be parsed using the method *Import*:
 ~~~python
 Db.Import('data/isc-rev-africa-select.csv')
 ~~~
-Non-standard csv formats can also be parsed, by manually specifying which header information to be read (and which not). For example:
+Non-standard csv formats can also be parsed using *Import*, by specifying the file format (column names and skipped fields) trough an *Header* variable. For example:
 ~~~python
 H = ['Id','','Year','Month','Day','Hour','Minute','Second',
      'Longitude','Latitude','','','','Depth','DepError',
