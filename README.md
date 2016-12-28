@@ -142,7 +142,7 @@ Identically, the catalogue object can be exported in csv standard format with:
 ~~~python
 Db.Export('data/isc-rev-africa-select.csv')
 ~~~
-Strong limitation of the standard CATK format is that only one solution is possible per event, either when reading and writing a file. To avoid this problem, ISF format can be used instead (see parser module).
+A significant limitation of using the standard CATK format is that only one solution (magnitude or location) is possible per event, either when reading and writing a file. To avoid this problem, ISF format (see parser module) and binary I/O should be used instead.
 
 #### 1.3.3 - Reading/Writing Binary Files
 To speed up I/O access to database information when storing catalogue objects on disk for subsequent use, binary (CPickle) files can be used. This can be done simply with:
@@ -155,26 +155,26 @@ Db.Load('data/isc-gem-v3.bin')
 
 ### 1.4 - Catalogue Manipulation
 #### 1.4.1 - Event Selection
-Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to specific rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed, for example:
+Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed:
 ~~~python
 # Keep only events with one or more ISC Location solutions
 Db.Filter('LocCode', 'ISC')
 # Multiple values can also be provided
 Db.Filter('LocCode', ['ISC','GCMT','NEIC'])
 ~~~
-Inequality checks are also allowed, by specifying the argument *Opr*:
+However, inequality checks are also allowed, by specifying the argument *Opr*:
 ~~~python
 # Select magnitude equal or higher than 5
 Db.Filter('MagSize', 5, Opr='>=')
 # Remove unknown depth solutions
 Db.Filter('Depth', None, Opr='!=')
 ~~~
-Combination of the arguments *All* and *Best* can be used to perform conditional selection. *All* is used to select items which contain all values in the list (equivalent to booleand *and*). This is often the case when we want to compare all earthquake events with multiple solutions from different agencies. *Best*, on the contrary, selects items with any occurence of the first element of the list. If not present, it searches for a match with the second element and so on (equivalent to boolean *or*):
+Optional boolean arguments *All* and *Best* can be used to perform conditional selection. *All* is used to select items which contain all values in the match list (equivalent to boolean *and*). This is often the case when we want to compare all earthquake events with multiple solutions from different agencies. *Best*, on the contrary, selects items according the occurence of just the first matching element (equivalent to boolean *or*).
 ~~~python
 Db.Filter('LocCode', ['ISC','GCMT'], All=True)
 Db.Filter('LocCode', ['ISC','GCMT'], Best=True)
 ~~~
-By default, the method remove items from the database of the object permanently. To avoid this, an hard-copy of the object can be created in output by using the argument *Owrite*:
+By default, the method remove non-matching items from the database object permanently. To avoid this behaviour, an hard-copy of the object can be instead created in output by setting the boolean argument *Owrite* to `False`:
 ~~~python
 DbNew = Db.Filter('LocCode', ['ISC','GCMT'], Owrite=True)
 ~~~
