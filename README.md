@@ -153,8 +153,20 @@ Db.Dump('data/isc-gem-v3.bin')
 Db.Load('data/isc-gem-v3.bin')
 ~~~
 
+#### 1.3.4 - Copying and Merging Catalogues
+An hard-copy of a whole database object can be created using the method *Copy*:
+~~~python
+DbNew = Db.Copy()
+~~~
+Events from one catalogue can be appended to the event list of a second one by using the method *Append*:
+~~~python
+Db2.Append(Db)
+~~~
+This method, however does not search for and merges duplicated events (for that, we refer to the module *Selection*).
+
 ### 1.4 - Catalogue Manipulation
-#### 1.4.1 - Event Selection
+
+#### 1.4.1 - Basic Event Selection
 Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed:
 ~~~python
 # Keep only events with one or more ISC Location solutions
@@ -179,16 +191,17 @@ By default, the method remove non-matching items from the database object perman
 DbNew = Db.Filter('LocCode', ['ISC','GCMT'], Owrite=True)
 ~~~
 
-#### 1.4.2 - Others
-An hard-copy of a whole database object can be created using the method *Copy*:
+#### 1.4.2 - Managing database Fields
+The method *SetField* is used to modify simultaneously all entries for a specified database field.
 ~~~python
-DbNew = Db.Copy()
+Db.SetField('MagCode', 'GEM')
 ~~~
-Events from one catalogue can be appended to the event list of a second one by using the method *Append*:
+The optional argument *Match*, instead, filter only those entries matching the specified key/value pair.
 ~~~python
-Db2.Append(Db)
+Db.SetField('MagType','Mw',Match=['MagCode', 'ISC'])
 ~~~
-This method, however does not search for and merges duplicated events (for that, we refer to the module *Selection*).
+
+
 
 ### 1.5 - Extracting Information
 
