@@ -1,6 +1,17 @@
 # CatalogueTool-Lite
 *A simplified Python toolkit for earthquake catalogue manipulation*
 
+The toolkit consists of 9 main modules:
+  * **Catalogue** - The main module for database creation
+  * **Parsers** - A collection of ad-hoc parsers for specific catalogues and bulletins
+  * **Selection** - Functions for high-level manipulation of earthquake databases
+  * **Exploration** - Functions to explore database information and statistical analysis
+  * **Regressor** - Utilities for magnitude conversion homogenisation
+  * **MagRules** - Library of magnitude conversion functions
+  * **MapTools** - Utility to plot the earthquake database on a map
+  * **IscWeb** - API to download isf catalogues from the ISC web
+  * **IscCode** - ISC agency code list
+
 ## 1 - The Module *Catalogue*
 
 ### 1.1 - Initialisation
