@@ -3,7 +3,7 @@
 
 The toolkit consists of 9 main modules:
   * **Catalogue** - The main module for database creation
-  * **Parsers** - A collection of ad-hoc parsers for specific catalogues and bulletins
+  * **Parsers** - A collection of ad-hoc parsers for specific catalogues and bulletins (ISC, GCMT...)
   * **Selection** - Functions for high-level manipulation of earthquake databases
   * **Exploration** - Functions to explore database information and statistical analysis
   * **Regressor** - Utilities for magnitude conversion homogenisation
