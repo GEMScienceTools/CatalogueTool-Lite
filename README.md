@@ -213,17 +213,17 @@ Db.SetID(Str0='Before_number', Str1='After_Number'):
 ~~~
 
 ### 1.5 - Extracting Database Information
-The method *Size* provides the number of items (events) contained in a database object. Event information can be obtained by list index of ID using the method *Print*:
+The method *Size* provides the number of items (events) contained in a database object. Single event information can then be obtained by list index of ID string using the method *Print*:
 ~~~python
 Db0.Print(2000)
 
-Output: Event Id: 02000
-Location:
-[0] - Year: 1972 Month: 2 Day: 1 Hour: 11 Minute: 42 Second: 23.15 Latitude: 35.3609 Longitude: -4.5653 Depth: 41.6 Agency: ISC Prime: True
-Magnitude:
-[0] - Type: Mw Size: 4.09 Error: 0.28 Agency: NEIS
-Log:
-MAGCONV(NEIS:mb);PREID(775874);PREID(02004);
+>> Output: Event Id: 02000
+>> Location:
+>> [0] - Year: 1972 Month: 2 Day: 1 Hour: 11 Minute: 42 Second: 23.15 Latitude: 35.3609 >> Longitude: -4.5653 Depth: 41.6 Agency: ISC Prime: True
+>> Magnitude:
+>> [0] - Type: Mw Size: 4.09 Error: 0.28 Agency: NEIS
+>> Log:
+>> MAGCONV(NEIS:mb);PREID(775874);PREID(02004);
 ~~~
 
 
