@@ -78,6 +78,7 @@ Several methods for database manipulation, I/O and exploration are available:
   * *SetField* - Set database key field to a specific value
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
+
 These methods are grouped in four main categories, we are described in the following.
 
 ### 1.3 - Catalogue I/O
@@ -191,17 +192,25 @@ By default, the method remove non-matching items from the database object perman
 DbNew = Db.Filter('LocCode', ['ISC','GCMT'], Owrite=True)
 ~~~
 
-#### 1.4.2 - Managing database Fields
+#### 1.4.2 - Managing Database Fields
 The method *SetField* is used to modify simultaneously all entries for a specified database field.
 ~~~python
 Db.SetField('MagCode', 'GEM')
 ~~~
 The optional argument *Match*, instead, filter only those entries matching the specified key/value pair.
 ~~~python
-Db.SetField('MagType','Mw',Match=['MagCode', 'ISC'])
+Db.SetField('MagType', 'Mw', Match=['MagCode','ISC'])
 ~~~
 
-
+#### 1.4.2 - Sorting Events
+After merging information from separate databases, event list might not be sorted chronologically. The method *Sort* can be used to sort items with millisecond precision.
+~~~python
+Db.Sort()
+~~~
+In combination, the method *SetID* can be used to regenerate the events ID according to progressive numbering, with optional formatting strings:
+~~~python
+Db.SetID(Str0='Before_number', Str1='After_Number'):
+~~~
 
 ### 1.5 - Extracting Information
 
