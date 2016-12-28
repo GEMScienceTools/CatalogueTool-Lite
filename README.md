@@ -1,16 +1,19 @@
 # CatalogueTool-Lite
 *A simplified Python toolkit for earthquake catalogue manipulation*
 
-## 1 - Module Catalogue
-A catalogue object can be instanciated using the *Database* class in the *Catalogue* library:
+## 1 - The Module *Catalogue*
+
+### 1.1 - Initialisation
+A catalogue object can be instantiated using the *Database* class from the *Catalogue* module as:
 ~~~
 import Catalogue as Cat
 Db0 = Cat.Database('Some Name (Optional)','Some Information (Optional)')
 ~~~
+Optional parameters are the catalogue name and a description string.
 
-### 1.1 - Object Structure
+### 1.2 - Object Structure
 
-#### 1.1.1 - Attributes
+#### 1.2.1 - Attributes
 The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary for general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
 Each element of the *Events* list is practically a dictionary containing data of an single event, grouped in four main keys: *Id*, *Magnitude*, *Location* and *Log*.
 Here is an example:
@@ -45,7 +48,7 @@ As it can be seen from the example, *Location* and *Magnitude* are also list of 
 *Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data.
 In the example above, the event *02000* contains two independent magnitude solutions, but only one location solution.
 
-#### 1.1.2 - Methods
+#### 1.2.2 - Methods
 Several methods for database manipulation, I/O and exploration are available:
   * *AddEvent* - Add an earthquake event to the database
   * *DelEvent* - Remove an earthquake avent from the database
@@ -65,10 +68,10 @@ Several methods for database manipulation, I/O and exploration are available:
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
 
-### 1.2 - Catalogue I/O
+### 1.3 - Catalogue I/O
 Once instantiated an catalogue object, the database can be inflated manually (element by element) or by parsing an external source file. A parsed catalogue can also be manually augmented with new information.
 
-#### 1.2.1 - Creating a Catalogue Manually
+#### 1.3.1 - Creating a Catalogue Manually
 As an example, database items can be created manually in these ways:
 ~~~python
 import Catalogue as Cat
@@ -98,7 +101,7 @@ Db.DelEvent('E003')
 ~~~
 Providing all key fields is not compulsory. The *AddEvent* method will only include the available information.
 
-#### 1.2.2 - Reading/Writing ASCII Files
+#### 1.3.2 - Reading/Writing ASCII Files
 Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form (header keywords are self-explanatory):
 
 | Id | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude | Depth | DepError | LocCode | MagSize | MagError | MagType | MagCode |
@@ -129,7 +132,7 @@ Db.Export('data/isc-rev-africa-select.csv')
 ~~~
 Strong limitation of the standard CATK format is that only one solution is possible per event, either when reading and writing a file. To avoid this problem, ISF format can be used instead (see parser module).
 
-#### 1.2.3 - Reading/Writing Binary Files
+#### 1.3.3 - Reading/Writing Binary Files
 To speed up I/O access to database information when storing catalogue objects on disk for subsequent use, binary (CPickle) files can be used. This can be done simply with:
 ~~~python
 # Writing to binary
@@ -138,8 +141,8 @@ Db.Dump('data/isc-gem-v3.bin')
 Db.Load('data/isc-gem-v3.bin')
 ~~~
 
-### 1.3 - Catalogue Manipulation
-#### 1.3.1 - Event Selection
+### 1.4 - Catalogue Manipulation
+#### 1.4.1 - Event Selection
 Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to specific rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed, for example:
 ~~~python
 # Keep only events with one or more ISC Location solutions
@@ -164,7 +167,7 @@ By default, the method remove items from the database of the object permanently.
 DbNew = Db.Filter('LocCode', ['ISC','GCMT'], Owrite=True)
 ~~~
 
-#### 1.3.2 - Others
+#### 1.4.2 - Others
 An hard-copy of a whole database object can be created using the method *Copy*:
 ~~~python
 DbNew = Db.Copy()
@@ -175,6 +178,6 @@ Db2.Append(Db)
 ~~~
 This method, however does not search for and merges duplicated events (for that, we refer to the module *Selection*).
 
-### 1.4 - Extracting Information
+### 1.5 - Extracting Information
 
 
