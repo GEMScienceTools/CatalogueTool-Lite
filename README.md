@@ -158,6 +158,7 @@ Db.Load('data/isc-gem-v3.bin')
 
 #### 1.4.1 - Basic Event Selection
 Probably, the most useful method for event selection is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a given Magnitude or Location key, and filters the events based to value matching.
+
 By default, an equality match is performed:
 ~~~python
 # Keep only events with one or more ISC Location solutions
