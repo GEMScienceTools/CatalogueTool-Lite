@@ -14,7 +14,7 @@ The toolkit consists of 9 main modules:
 
 ## 1 - The Module *Catalogue*
 
-### 1.1 - Initialisation
+### 1.1 - Database Initialisation
 A catalogue object can be instantiated using the *Database* class from the *Catalogue* module as:
 ~~~
 import Catalogue as Cat
@@ -25,9 +25,9 @@ Optional parameters are the catalogue name and a description string.
 ### 1.2 - Object Structure
 
 #### 1.2.1 - Attributes
-The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary storing general information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (a list) of earthquake records and a more complex internal structure.
-Each element of the *Events* list is in fact a dictionary containing data of a single event, grouped by four main keys: *Id*, *Magnitude*, *Location* and *Log*.
-Here is an example:
+The most important attributes of the catalogue objects are the *Header* and *Events* variables. While *Header* is basically just a dictionary storing diverse information about the catalogue (e.g. name, some descrition...), *Events* is the actual database (as list) of earthquake records, with a more complex internal structure.
+Each element of the *Events* list is itself a dictionary containing data of a single event, grouped in four main keys: *Id*, *Magnitude*, *Location* and *Log*.
+Here it is an example for one event:
 ~~~python
 Db.Events[0] = {'Id': '02000',
                 'Location': [{'LocCode': 'ISC',  # First Location Solution
@@ -55,9 +55,8 @@ Db.Events[0] = {'Id': '02000',
                                'MagType': 'Ms'}],
                 'Log': 'MERGED(EMEC Africa:1234);PREID(1111);'}
 ~~~
-As it can be seen from the example, *Location* and *Magnitude* are also list of dictionaries. Each elements of those lists represents a separate solution from a particular agency.
+*Location* and *Magnitude* are also list of dictionaries. Each elements of those lists represents a separate solution from a particular agency. In the example above, the event *02000* contains two independent magnitude solutions, but only one location solution.
 *Log* is jut a container for processing information (explained later), although it could be used to store any arbitrary text data of an event.
-In the example above, the event *02000* contains two independent magnitude solutions, but only one location solution.
 
 #### 1.2.2 - Methods
 Several methods for database manipulation, I/O and exploration are available:
@@ -68,14 +67,14 @@ Several methods for database manipulation, I/O and exploration are available:
   * *Load* - Import database structure from binary file (cPickle compressed)
   * *Dump* - Exprot database structure to binary file (cPickle compressed)
   * *Filter* - Filter earthquake events by key field and rule
+  * *SetField* - Set database key field to a specific value
   * *Extract* - Extract database information by key field
   * *KeyStat* - Compute statistics on key field occurrence
+  * *Print* - Print event information on screen (by ID or index)
   * *Copy* - Create hardcopy of the database
   * *Append* - Concatenate event list of two databases
   * *Size* - Output number of earthquake events
-  * *Print* - Print event information on screen (by ID or index)
   * *Sort* - Sort events according to origin time
-  * *SetField* - Set database key field to a specific value
   * *GetIndex* - Get event index from ID string
   * *SetID* - Regenerate progressive IDs
 
@@ -112,10 +111,10 @@ Db.AddEvent('E002', Magnitude=M, Append=True)
 # Remove an existing item (by ID)
 Db.DelEvent('E003')
 ~~~
-Providing all key fields is not compulsory. The *AddEvent* method will only include the available information.
+Providing all key fields is however not compulsory. The *AddEvent* method will include only the available information.
 
 #### 1.3.2 - Reading/Writing ASCII Files
-Manual creation of a large number of items is however impractical. To avoid that, earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is in the form (header keywords should be self-explanatory):
+Manual creation of a large number of items is however impractical. To avoid that, an earthquake catalogue can be parsed from a csv (ascii) file. The standard format used in the toolkit is:
 
 | Id | Year | Month | Day | Hour | Minute | Second | Longitude | Latitude | Depth | DepError | LocCode | MagSize | MagError | MagType | MagCode |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -123,20 +122,21 @@ Manual creation of a large number of items is however impractical. To avoid that
 | 16957879 | 1905 | 12 | 4 | 12 | 20 | 7.96 | 38.8300 | 37.2160 | 15.00 | 5.60 | ISC-GEM | 5.56 | 0.63 | Mw | ISC-GEM |
 | 16958009 | 1908 | 12 | 28 | 4 | 20 | 26.62 | 15.3490 | 38.0000 | 15.00 | 6.00 | ISC-GEM | 7.03 | 0.37 | Mw | ISC-GEM |
 
+Keywords are the same as those used in the *Events* structure.
+
 A standard csv catalogue can then be parsed using the method *Import*:
 ~~~python
 Db.Import('data/isc-rev-africa-select.csv')
 ~~~
-Non-standard csv formats can also be parsed using *Import*, by specifying the file format (column names and skipped fields) trough an *Header* variable. For example:
+
+Nonetheless, non-standard csv formats can also be parsed using *Import*. In this casethe file format (column names and skipped fields) must be explicitly specified through the *Header* variable. For example:
 ~~~python
 H = ['Id','','Year','Month','Day','Hour','Minute','Second',
      'Longitude','Latitude','','','','Depth','DepError',
      'MagSize','MagError','','','','','','','','','']
 
 Db = Cat.Database('ISC-GEM')
-Db.Import('data/isc-gem-v3.csv',Header=H,
-                                SkipLine=1,
-                                Delimiter=',')
+Db.Import('data/isc-gem-v3.csv', Header=H, SkipLine=1, Delimiter=',')
 ~~~
 
 Identically, the catalogue object can be exported in csv standard format with:
