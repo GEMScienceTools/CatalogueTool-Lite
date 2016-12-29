@@ -2,11 +2,11 @@
 *A simplified Python toolkit for earthquake catalogue manipulation*
 
 The toolkit consists of 9 main modules:
-  * **Catalogue** - The main module for database creation an I/O
-  * **Parsers** - A collection of ad-hoc parsers for specific catalogues and bulletins (ISC, GCMT...)
-  * **Selection** - Functions for high-level manipulation of earthquake databases
-  * **Exploration** - Functions to explore database information and statistical analysis
-  * **Regressor** - Utilities for magnitude conversion homogenisation
+  * **Catalogue** - The main module for database manipulation an I/O
+  * **Parsers** - Ad-hoc parsers for specific catalogues and bulletins (ISC, GCMT...)
+  * **Selection** - Functions for high-level manipulation of catalogue objects
+  * **Exploration** - Functions to explore database information and perform basic statistical analysis
+  * **Regressor** - Utilities for magnitude conversion and catalogue homogenisation
   * **MagRules** - Library of magnitude conversion functions
   * **MapTools** - Utility to plot earthquake databases on a map
   * **IscWeb** - API to download isf catalogues from the ISC web
@@ -217,7 +217,7 @@ The method *Size* provides the number of items (events) contained in a database 
 ~~~python
 Db0.Print(2000)
 ~~~
-
+with output:
 ~~~shell
 Event Id: 02000
 Location:
