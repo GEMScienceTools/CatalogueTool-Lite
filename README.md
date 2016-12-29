@@ -154,10 +154,10 @@ Db.Dump('data/isc-gem-v3.bin')
 Db.Load('data/isc-gem-v3.bin')
 ~~~
 
-### 1.4 - Catalogue Manipulation
+### 1.4 - Basic Catalogue Manipulation
 
-#### 1.4.1 - Basic Event Selection
-Probably, the most useful method for event selection is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a given Magnitude or Location key, and filters the events based to value matching.
+#### 1.4.1 - Event Selection by Key
+Probably, the most useful method for event selection is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a given Magnitude or Location key by filtering out all non-matching events.
 
 By default, an equality match is performed:
 ~~~python
@@ -166,29 +166,29 @@ Db.Filter('LocCode', 'ISC')
 # Multiple values can also be provided
 Db.Filter('LocCode', ['ISC','GCMT','NEIC'])
 ~~~
-However, inequality checks are also allowed, by specifying the argument *Opr*:
+However, inequality matching is also allowed, by specifying the argument *Opr*:
 ~~~python
 # Select magnitude equal or higher than 5
 Db.Filter('MagSize', 5, Opr='>=')
 # Remove unknown depth solutions
 Db.Filter('Depth', None, Opr='!=')
 ~~~
-Optional boolean arguments *All* and *Best* can be used to perform conditional selection. *All* is used to select items which contain all values in the match list (equivalent to boolean *and*). This is often the case when we want to compare all earthquake events with multiple solutions from different agencies. *Best*, on the contrary, selects items according the occurence of just the first matching element (equivalent to boolean *or*).
+The optional boolean arguments *All* and *Best* can be used to perform conditional selection of multiple entries. *All* is used to select items which contain all values in the match list (equivalent to boolean `and`). This is often the case when comparing multiple solutions from different agencies. *Best*, on the contrary, selects items according to the occurence of just the first matching element of the list (equivalent to boolean `or`). This is very useful for agency prioritisation.
 ~~~python
 Db.Filter('LocCode', ['ISC','GCMT'], All=True)
 Db.Filter('LocCode', ['ISC','GCMT'], Best=True)
 ~~~
-By default, the method remove non-matching items from the database object permanently. To avoid this behaviour, an hard-copy of the object can be instead created in output by setting the boolean argument *Owrite* to `False`:
+By default, the *Filter* method remove non-matching items from the database object permanently. To avoid this behaviour, an hard-copy of the object can be created in output by setting the boolean argument *Owrite* to `False`:
 ~~~python
 DbNew = Db.Filter('LocCode', ['ISC','GCMT'], Owrite=True)
 ~~~
 
-#### 1.4.2 - Managing Database Fields
-The method *SetField* is used to modify simultaneously all entries for a specified database field.
+#### 1.4.2 - Modifying Database Fields
+Each database field can be individually accessed/modified through the *Events* structure. The method *SetField* is used to modify simultaneously all entries of the database for a given Key.
 ~~~python
 Db.SetField('MagCode', 'GEM')
 ~~~
-The optional argument *Match*, instead, filter only those entries matching the specified key/value pair.
+The optional argument *Match* can be used to modify only those entries matching a specific key/value pair (conditional filtering).
 ~~~python
 Db.SetField('MagType', 'Mw', Match=['MagCode','ISC'])
 ~~~
