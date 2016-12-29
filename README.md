@@ -237,9 +237,13 @@ MAGCONV(NEIS:mb);PREID(775874);PREID(02004);
 The module *Parsers* extends the functionalities of the standard database object to import fixed-format catalogues and bulletins.
 Presently available parsers are for the ISC bulletin in ISF format:
 ~~~python
-
+import Parsers as Par
+Db = Par.Database('ISC-AFRICA')
+Db.ImportIsf('data/isc-rev-africa.isf')
 ~~~
 and for GCMT catalogue in NDK format:
 ~~~python
-
+import Parsers as Par
+Db = Par.Database('GCMT')
+Db.ImportNdk('data/jan76_dec13.ndk')
 ~~~
