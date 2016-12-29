@@ -190,18 +190,29 @@ Db.SetField('MagCode', 'GEM')
 ~~~
 The optional argument *Match* can be used to modify only those entries matching a specific key/value pair (conditional filtering).
 ~~~python
-Db.SetField('MagType', 'Mw', Match=['MagCode','ISC'])
+Db.SetField('MagType', 'Mw', Match=['MagCode','GEM'])
 ~~~
 
-#### 1.4.2 - Sorting Events
-After merging information from separate databases, event list might not be sorted chronologically. The method *Sort* can be used to sort items with millisecond precision.
+#### 1.4.3 - Sorting Events
+After merging information from separate databases, event list might not be sorted chronologically anymore. The method *Sort* can be used to sort items within a second precision.
 ~~~python
 Db.Sort()
 ~~~
-In combination, the method *SetID* can be used to regenerate the events ID according to progressive numbering, with optional formatting strings:
+In combination, the method *SetID* can be used to regenerate events ID label according to a progressive numbering. Optional formatting strings can be added before and/or after the ID number:
 ~~~python
 Db.SetID(Str0='Before_number', Str1='After_Number'):
 ~~~
+
+#### 1.4.4 - Copying and Merging Catalogues
+A hard-copy of a whole database object can be performed using the method *Copy*:
+~~~python
+DbNew = Db.Copy()
+~~~
+Events from one catalogue can be appended to the event list of a second one by using the method *Append*:
+~~~python
+Db2.Append(Db)
+~~~
+This method, however does not search for or merges duplicated events (for that, we refer to the module *Selection*).
 
 ### 1.5 - Extracting Database Information
 The method *Size* provides the number of items (events) contained in a database object. Single event information can then be obtained by list index of ID string using the method *Print*:
