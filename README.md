@@ -129,7 +129,7 @@ A standard csv catalogue can then be parsed using the method *Import*:
 Db.Import('data/isc-rev-africa-select.csv')
 ~~~
 
-Nonetheless, non-standard csv formats can also be parsed using *Import*. In this casethe file format (column names and skipped fields) must be explicitly specified through the *Header* variable. For example:
+Nonetheless, non-standard csv formats can also be parsed using *Import*. In this case, the file format (either column names and fields to skip) must be explicitly specified through the *Header* variable. For example:
 ~~~python
 H = ['Id','','Year','Month','Day','Hour','Minute','Second',
      'Longitude','Latitude','','','','Depth','DepError',
@@ -143,32 +143,22 @@ Identically, the catalogue object can be exported in csv standard format with:
 ~~~python
 Db.Export('data/isc-rev-africa-select.csv')
 ~~~
-A significant limitation of using the standard CATK format is that only one solution (magnitude or location) is possible per event, either when reading and writing a file. To avoid this problem, ISF format (see parser module) and binary I/O should be used instead.
+Unfortunately, a significant limitation of using the standard CATK format is that only one solution (magnitude or location) is possible per event, either when importing or exporting a csv file. To circumvent the problem, ISF format (see *Parser* module) and binary I/O (next section) should be used instead.
 
 #### 1.3.3 - Reading/Writing Binary Files
-To speed up I/O access to database information when storing catalogue objects on disk for subsequent use, binary (CPickle) files can be used. This can be done simply with:
+To speedup disk I/O access of large catalogue objects, binary (CPickle) files can be used instead of csv. This can simply be done with:
 ~~~python
-# Writing to binary
+# Writing to binary file
 Db.Dump('data/isc-gem-v3.bin')
-# Reading from binary
+# Reading from binary file
 Db.Load('data/isc-gem-v3.bin')
 ~~~
-
-#### 1.3.4 - Copying and Merging Catalogues
-An hard-copy of a whole database object can be created using the method *Copy*:
-~~~python
-DbNew = Db.Copy()
-~~~
-Events from one catalogue can be appended to the event list of a second one by using the method *Append*:
-~~~python
-Db2.Append(Db)
-~~~
-This method, however does not search for and merges duplicated events (for that, we refer to the module *Selection*).
 
 ### 1.4 - Catalogue Manipulation
 
 #### 1.4.1 - Basic Event Selection
-Probably, the most important and widely used method is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a specific key, and filters the events according to value matching. By default, an equality check is performed:
+Probably, the most useful method for event selection is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a given Magnitude or Location key, and filters the events based to value matching.
+By default, an equality match is performed:
 ~~~python
 # Keep only events with one or more ISC Location solutions
 Db.Filter('LocCode', 'ISC')
