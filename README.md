@@ -12,6 +12,7 @@ The toolkit consists of 9 main modules:
   * **IscWeb** - API to download isf catalogues from the ISC web
   * **IscCode** - ISC agency code list
 
+<!--- -------------------------------------------------------------------------------- --> 
 ## 1 - The Module *Catalogue*
 
 ### 1.1 - Database Initialisation
@@ -156,7 +157,7 @@ Db.Load('data/isc-gem-v3.bin')
 
 ### 1.4 - Basic Catalogue Manipulation
 
-#### 1.4.1 - Event Selection by Key
+#### 1.4.1 - Event Selection by Key/Value
 Probably, the most useful method for event selection is *Filter*, which allows removing events from a catalogue according to user-defined rules. The method operates on a given Magnitude or Location key by filtering out all non-matching events.
 
 By default, an equality match is performed:
@@ -193,7 +194,7 @@ The optional argument *Match* can be used to modify only those entries matching 
 Db.SetField('MagType', 'Mw', Match=['MagCode','GEM'])
 ~~~
 
-#### 1.4.3 - Sorting Events
+#### 1.4.3 - Sorting Events Chronologically
 After merging information from separate databases, event list might not be sorted chronologically anymore. The method *Sort* can be used to sort items within a second precision.
 ~~~python
 Db.Sort()
@@ -203,14 +204,14 @@ In combination, the method *SetID* can be used to regenerate events ID label acc
 Db.SetID(Str0='Before_number', Str1='After_Number'):
 ~~~
 
-#### 1.4.4 - Copying and Merging Catalogues
+#### 1.4.4 - Copying and Merging Databases
 A hard-copy of a whole database object can be performed using the method *Copy*:
 ~~~python
 DbNew = Db.Copy()
 ~~~
 Events from one catalogue can be appended to the event list of a second one by using the method *Append*:
 ~~~python
-Db2.Append(Db)
+Db.Append(Db2)
 ~~~
 This method, however does not search for or merges duplicated events (for that, we refer to the module *Selection*).
 
