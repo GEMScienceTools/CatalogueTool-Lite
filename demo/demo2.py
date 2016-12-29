@@ -1,5 +1,5 @@
 """
-EXAMPLE 2 - DOWNLOADING ISC CATALOGUE
+DOWNLOADING ISC CATALOGUE
 """
 
 import IscWeb as Iw
@@ -11,9 +11,16 @@ lat = [-40, 40]
 # Initializing the downloader
 isc_url = Iw.ISCBulletinUrl()
 
-# Setting the maximum available time period
+# List available fields
+isc_url.ListFields()
+
+# Setting time period
 isc_url.SetField('StartYear','2010')
 isc_url.SetField('EndYear','2013')
+
+# Setting magnitude threshold
+isc_url.SetField('MinimumMagnitude','6.5')
+isc_url.SetField('MaximumMagnitude','7.0')
 
 # Search restricted to a buffer area
 isc_url.SetField('SearchAreaShape','RECT')
@@ -29,7 +36,7 @@ isc_url.UseMirror()
 isc_url.SetField('OutputFormat','ISF')
 isc_url.SetField('CatalogueType','REVIEWED')
 
-# Performing download
+# Performing download (split over two year blocks)
 isc_url.GetCatalogue(SplitYears=2)
 
 # Write catalogue to disk

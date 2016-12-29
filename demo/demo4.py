@@ -10,8 +10,6 @@ import Catalogue as Cat
 Db = Cat.Database('ISC-Africa')
 Db.Import('data/isc-rev-africa-select.csv')
 
-Db.Dump('data/isc-rev-africa-select.bin')
-
 #-----------------------------------------------------------------------------------------
 # 2) ARBITRARY FORMAT (USER DEFINED)
 
@@ -24,10 +22,10 @@ Db.Import('data/isc-gem-v3.csv',Header=H,
                                 SkipLine=1,
                                 Delimiter=',')
 
-Db.SetKey('Prime',True)
-Db.SetKey('LocCode','ISC-GEM')
-Db.SetKey('MagCode','ISC-GEM')
-Db.SetKey('MagType','MW')
+Db.SetField('Prime',True)
+Db.SetField('LocCode','ISC-GEM')
+Db.SetField('MagCode','ISC-GEM')
+Db.SetField('MagType','MW')
 
 #-----------------------------------------------------------------------------------------
 # Search Area (Africa) using internal filter
