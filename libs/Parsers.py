@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2010-2016 GEM Foundation
@@ -9,13 +10,17 @@
 #
 # CATK is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
 # with this download. If not, see <http://www.gnu.org/licenses/>
 #
 # Author: Poggi Valerio
+
+"""
+Module for Specific Catalogue Parsers
+"""
 
 import math as mt
 import Catalogue as Cat

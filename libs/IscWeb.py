@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2010-2016 GEM Foundation
@@ -9,7 +10,7 @@
 #
 # CATK is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Affero General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
@@ -18,7 +19,7 @@
 # Author: Poggi Valerio
 
 """
-Utility to download the ISC catalogue from website.
+Utility to download the ISC bulletin from the website.
 Version 20/10/2016
 """
 
@@ -67,7 +68,7 @@ class ISCBulletinUrl():
     self.Request["NoDepthEvents"]           = "null_dep=on"
     self.Request["MinimumMagnitude"]        = "min_mag="
     self.Request["MaximumMagnitude"]        = "max_mag="
-    self.Request["NoMagnitudeEvents"]       = "null_mag=on"
+    self.Request["NoMagnitudeEvents"]       = "null_mag="
     self.Request["MagnitudeType"]           = "req_mag_type="
     self.Request["MagnitudeAgency"]         = "req_mag_agcy="
     self.Request["FocalMechanismAgency"]    = "req_fm_agcy=Any"
@@ -162,7 +163,8 @@ class ISCBulletinUrl():
 
     UrlString = self.BaseServer
     for value in self.Request.itervalues():
-      UrlString += value + "&"
+      if value.split("=")[1]:
+        UrlString += value.replace(':','%3A') + "&"
 
     return UrlString
 
