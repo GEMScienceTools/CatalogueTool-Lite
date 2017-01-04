@@ -232,7 +232,7 @@ MAGCONV(NEIS:mb);PREID(775874);PREID(02004);
 ~~~
 
 <!--- -------------------------------------------------------------------------------- --> 
-## 1 - The Module *Parsers*
+## 2 - The Module *Parsers*
 
 The module *Parsers* extends the functionalities of the standard database object to import fixed-format catalogues and bulletins.
 Presently available parsers are for the ISC bulletin in ISF format:
