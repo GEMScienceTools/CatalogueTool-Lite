@@ -92,7 +92,6 @@ class Database(Cat.Database):
         M['MagCode'] = IsfMag[20:29].strip(' ')
       return M
 
-
     # Open ISF file
     with open(file_name, 'r') as f:
 
@@ -130,21 +129,18 @@ class Database(Cat.Database):
       return L
 
     def _GetId(CmtStr):
-
       I = []
       if CmtStr:
         I = CmtStr[0:16].strip(' ')
       return I
 
     def _GetExponent(CmtStr):
-
       E = []
       if CmtStr:
         E = float(CmtStr[0:2])
       return E
 
     def _GetMagnitude(CmtStr, E):
-
       M = {}
       if CmtStr:
         # Hanks & Kanamori equation
@@ -175,6 +171,94 @@ class Database(Cat.Database):
 
         if I:
           self.AddEvent(I, L, M)
+        else:
+          break
+
+      f.close()
+      return
+
+    # Warn user if model file does not exist
+    print 'File not found.'
+
+  #---------------------------------------------------------------------------------------
+
+  def ImportIgn(self, file_name):
+
+    def _GetId(EventStr):
+      I = []
+      if EventStr:
+        I = EventStr[0:12].strip(' ')
+      return I
+
+    def _GetLocation(EventStr):
+      L = {}
+      if EventStr:
+        L['Year'] = EventStr[23:27].strip(' ')
+        L['Month'] = EventStr[20:22].strip(' ')
+        L['Day'] = EventStr[17:19].strip(' ')
+        L['Hour'] = EventStr[34:36].strip(' ')
+        L['Minute'] = EventStr[37:39].strip(' ')
+        L['Second'] = EventStr[40:42].strip(' ')
+        L['Latitude'] = EventStr[42:57].strip(' ')
+        L['Longitude'] = EventStr[57:72].strip(' ')
+        L['Depth'] = EventStr[72:87].strip(' ')
+        L['LocCode'] = 'IGN'
+      return L
+
+    def _GetMagnitude(EventStr):
+      M = {}
+      if EventStr:
+        M['MagSize'] = EventStr[102:117].strip(' ')
+        M['MagType'] = 'MW'
+        M['MagError'] = 0.
+        M['MagCode'] = 'IGN'
+        if EventStr[131] == '1':
+          M['MagType'] = 'MDs'
+        if EventStr[131] == '2':
+          M['MagType'] = 'MbLg'
+        if EventStr[131] == '3':
+          M['MagType'] = 'mb'
+        if EventStr[131] == '4':
+          M['MagType'] = 'mbLg'
+        if EventStr[131] == '5':
+          M['MagType'] = 'Mw'
+        if EventStr[131] == '6':
+          M['MagType'] = 'MLv'
+        if EventStr[131] == '7':
+          M['MagType'] = 'mb'
+        if EventStr[131] == '8':
+          M['MagType'] = 'mB'
+        if EventStr[131] == '9':
+          M['MagType'] = 'Mwp'
+        if EventStr[131] == '10':
+          M['MagType'] = 'MwmB'
+        if EventStr[131] == '11':
+          M['MagType'] = 'MwMwp'
+      return M
+
+    def _GetLog(EventStr):
+      O = []
+      if EventStr:
+        O = 'INFO({0});'.format(EventStr[135:-1])
+      return O
+
+    # Open IGN file
+    with open(file_name, 'r') as f:
+
+      # Read header
+      Header = f.readline().strip('\n')
+
+      while True:
+
+        EventStr = f.readline().strip('\n')
+
+        I = _GetId(EventStr)
+        L = _GetLocation(EventStr)
+        M = _GetMagnitude(EventStr)
+        O = _GetLog(EventStr)
+
+        if I:
+          self.AddEvent(I, L, M, O)
         else:
           break
 
