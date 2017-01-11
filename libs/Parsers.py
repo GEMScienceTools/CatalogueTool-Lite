@@ -209,7 +209,6 @@ class Database(Cat.Database):
       M = {}
       if EventStr:
         M['MagSize'] = EventStr[102:117].strip(' ')
-        M['MagType'] = 'MW'
         M['MagError'] = 0.
         M['MagCode'] = 'IGN'
         if EventStr[131] == '1':
