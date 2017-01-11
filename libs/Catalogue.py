@@ -133,7 +133,11 @@ class Database(object):
                          comment=Comment,
                          dtype='s')
 
-    for D in tab.data:
+    for I,D in enumerate(tab.data):
+      if 'Id' in D.keys():
+        I = D['Id']
+      else:
+        I += 1
       L = CU.LocationInit()
       M = CU.MagnitudeInit()
       for K in tab.header:
@@ -141,7 +145,11 @@ class Database(object):
           L[K] = D[K]
         if K in M:
           M[K] = D[K]
-      self.AddEvent(D['Id'], L, M)
+      if 'Log' in D.keys():
+        O = D['Log']
+      else:
+        O = []
+      self.AddEvent(I, L, M, O)
 
   #---------------------------------------------------------------------------------------
 

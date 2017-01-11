@@ -25,7 +25,7 @@ import CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
-def AreaSelect(Db, XY, File=[], Owrite=False):
+def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
 
   P = CU.Polygon()
 
@@ -38,15 +38,10 @@ def AreaSelect(Db, XY, File=[], Owrite=False):
   DbC.Header = cp.deepcopy(Db.Header)
 
   for E in Db.Events:
-
     Event = {}
-    Event['Id'] = E['Id']
     Event['Location'] = []
-    Event['Magnitude'] = E['Magnitude']
-    Event['Log'] = E['Log']
 
     for L in E['Location']:
-
       x = L['Longitude'];
       y = L['Latitude']
 
@@ -54,6 +49,11 @@ def AreaSelect(Db, XY, File=[], Owrite=False):
         Event['Location'].append(L)
 
     if Event['Location']:
+      Event['Id'] = E['Id']
+      Event['Log'] = E['Log']
+      Event['Magnitude'] = E['Magnitude']
+      if Any:
+        Event['Location'] = E['Location']
       DbC.Events.append(cp.deepcopy(Event))
 
   if Owrite:
@@ -214,6 +214,8 @@ def TimeSelect(Db, Date0, Date1, Owrite=False):
                       Date1[4],
                       Date1[5])
 
+  """
+  # OLD VERSION (COMPARE ONLY FIRST LOCATION)
   def GetSec(Event):
     L = Event['Location'][0]
     S = CU.DateToSec(L['Year'],
@@ -235,6 +237,31 @@ def TimeSelect(Db, Date0, Date1, Owrite=False):
 
   for I in Ind:
     DbN.Events.append(cp.deepcopy(Db.Events[I]))
+  """
+
+  DbN = Cat.Database()
+  DbN.Header = cp.deepcopy(Db.Header)
+
+  for E in Db.Events:
+    Event = {}
+    Event['Location'] = []
+
+    for L in E['Location']:
+      S = CU.DateToSec(L['Year'],
+                       L['Month'],
+                       L['Day'],
+                       L['Hour'],
+                       L['Minute'],
+                       L['Second'])
+
+      if S>=Sec0 and S<=Sec1:
+        Event['Location'].append(L)
+
+    if Event['Location']:
+      Event['Id'] = E['Id']
+      Event['Log'] = E['Log']
+      Event['Magnitude'] = E['Magnitude']
+      DbN.Events.append(cp.deepcopy(Event))
 
   if Owrite:
     Db.Events = DbN.Events
@@ -276,10 +303,26 @@ def SplitPrime(Db):
 def MergeDuplicate(DbA, DbB=[],
                         Twin=60.,
                         Swin=50.,
+                        Unit='Second',
                         Owrite=True,
                         Log=False):
 
   def GetDate(Event):
+
+    if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
+      print 'Warning: time unit not recognized'
+      return
+
+    if Unit == 'Minute':
+      Twin *= 60
+    if Unit == 'Hour':
+      Twin *= 60*60
+    if Unit == 'Day':
+      Twin *= 60*60*24
+    if Unit == 'Month':
+      Twin *= 60*60*24*12
+    if Unit == 'Year':
+      Twin *= 60*60*24*12*365
 
     L = Event['Location'][0]
     S = CU.DateToSec(L['Year'],
