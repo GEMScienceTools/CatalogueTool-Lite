@@ -307,22 +307,22 @@ def MergeDuplicate(DbA, DbB=[],
                         Owrite=True,
                         Log=False):
 
+  if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
+    print 'Warning: time unit not recognized'
+    return
+
+  if Unit == 'Minute':
+    Twin *= 60
+  if Unit == 'Hour':
+    Twin *= 60*60
+  if Unit == 'Day':
+    Twin *= 60*60*24
+  if Unit == 'Month':
+    Twin *= 60*60*24*12
+  if Unit == 'Year':
+    Twin *= 60*60*24*12*365
+
   def GetDate(Event):
-
-    if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
-      print 'Warning: time unit not recognized'
-      return
-
-    if Unit == 'Minute':
-      Twin *= 60
-    if Unit == 'Hour':
-      Twin *= 60*60
-    if Unit == 'Day':
-      Twin *= 60*60*24
-    if Unit == 'Month':
-      Twin *= 60*60*24*12
-    if Unit == 'Year':
-      Twin *= 60*60*24*12*365
 
     L = Event['Location'][0]
     S = CU.DateToSec(L['Year'],
