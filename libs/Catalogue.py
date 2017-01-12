@@ -148,7 +148,7 @@ class Database(object):
       if 'Log' in D.keys():
         O = D['Log']
       else:
-        O = []
+        O = ''
       self.AddEvent(I, L, M, O)
 
   #---------------------------------------------------------------------------------------
