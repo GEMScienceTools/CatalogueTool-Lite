@@ -311,26 +311,35 @@ def MergeDuplicate(DbA, DbB=[],
     print 'Warning: time unit not recognized'
     return
 
+  # Converting current-units to seconds
+  if Unit == 'Second':
+    Twin *= 1
+    Mask = (1,1,1,1,1,1)
   if Unit == 'Minute':
     Twin *= 60
+    Mask = (1,1,1,1,1,0)
   if Unit == 'Hour':
     Twin *= 60*60
+    Mask = (1,1,1,1,0,0)
   if Unit == 'Day':
     Twin *= 60*60*24
+    Mask = (1,1,1,0,0,0)
   if Unit == 'Month':
     Twin *= 60*60*24*12
+    Mask = (1,1,0,0,0,0)
   if Unit == 'Year':
     Twin *= 60*60*24*12*365
+    Mask = (1,0,0,0,0,0)
 
-  def GetDate(Event):
+  def GetDate(Event, Mask):
 
     L = Event['Location'][0]
-    S = CU.DateToSec(L['Year'],
-                     L['Month'],
-                     L['Day'],
-                     L['Hour'],
-                     L['Minute'],
-                     L['Second'])
+    S = CU.DateToSec(L['Year'] or Mask[0],
+                     L['Month'] or Mask[1],
+                     L['Day'] or Mask[2],
+                     L['Hour'] or Mask[3],
+                     L['Minute'] or Mask[4],
+                     L['Second'] or Mask[5])
     return S
 
   def GetCoor(Event):
@@ -355,7 +364,7 @@ def MergeDuplicate(DbA, DbB=[],
   Name = Db1.Header['Name']
 
   for J, E0 in enumerate(Db0.Events[:End]):
-    T0 = GetDate(E0)
+    T0 = GetDate(E0, Mask)
     C0 = GetCoor(E0)
 
     Start = 0 if DbB else J+1
@@ -365,7 +374,7 @@ def MergeDuplicate(DbA, DbB=[],
       dC = DeltaLen(C0, C1)
 
       if (dC <= Swin):
-        T1 = GetDate(E1)
+        T1 = GetDate(E1, Mask)
         dT = DeltaSec(T0, T1)
 
         if (dT <= Twin):
