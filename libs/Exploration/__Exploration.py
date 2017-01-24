@@ -286,4 +286,3 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   if OutFile:
     plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
 
-
