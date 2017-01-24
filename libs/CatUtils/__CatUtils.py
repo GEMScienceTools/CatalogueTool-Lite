@@ -207,7 +207,7 @@ def DateToSec(Year, Month, Day, Hour, Minute, Second):
 
 #-----------------------------------------------------------------------------------------
 
-class Polygon ():
+class Polygon():
 
   def __init__(self):
 
@@ -216,7 +216,7 @@ class Polygon ():
 
   #---------------------------------------------------------------------------------------
 
-  def Load (self, XY):
+  def Load(self, XY):
     """
     Input polygon can be defined in two possible ways:
     1) list of x-y float pairs, e.g.
@@ -250,7 +250,7 @@ class Polygon ():
 
   #---------------------------------------------------------------------------------------
 
-  def IsInside (self, x, y):
+  def IsInside(self, x, y):
 
     x0 = self.x[0]
     y0 = self.y[0]
