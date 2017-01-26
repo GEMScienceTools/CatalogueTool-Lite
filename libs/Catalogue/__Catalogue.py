@@ -155,22 +155,28 @@ class Database(object):
 
   def Export(self, FileName):
 
-      tab = AT.AsciiTable()
+    tab = AT.AsciiTable()
 
-      tab.header = ['Id','Year','Month','Day','Hour','Minute','Second',
-                    'Latitude','Longitude','Depth',
-                    'SecError','LatError','LonError','DepError',
-                    'LocCode','MagSize','MagError','MagType','MagCode','Log']
+    tab.header = ['Id','Year','Month','Day','Hour','Minute','Second',
+                  'Latitude','Longitude','Depth',
+                  'SecError','LatError','LonError','DepError',
+                  'LocCode','MagSize','MagError','MagType','MagCode','Log']
 
-      for E in self.Events:
-        Data = [E['Id']]
-        for Key in tab.header[1:-1]:
-          Grp = CU.KeyGroup(Key)
-          Data.append(E[Grp][0][Key])
-        Data.append(E['Log'])
-        tab.AddElement(Data)
+    DbC = self.Copy()
 
-      tab.Export(FileName)
+    for E in DbC.Events:
+      Data = [E['Id']]
+      if not E['Location']:
+        E['Location'] = [CU.LocationInit()]
+      if not E['Magnitude']:
+        E['Magnitude'] = [CU.MagnitudeInit()]
+      for Key in tab.header[1:-1]:
+        Grp = CU.KeyGroup(Key)
+        Data.append(E[Grp][0][Key])
+      Data.append(E['Log'])
+      tab.AddElement(Data)
+
+    tab.Export(FileName)
 
   #---------------------------------------------------------------------------------------
 
