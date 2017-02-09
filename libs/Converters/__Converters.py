@@ -51,11 +51,14 @@ def Catk2Hmtk(InputFile, OutputFile):
   tab.AddKey('SemiMinor90',index=12)
   tab.AddKey('ErrorStrike',index=13)
 
+  for H in tab.header:
+    tab.Replace(H,'None','')
+
   for D in tab.data:
     D['Agency']=D['LocCode']+'|'+D['MagCode']
-    D['SemiMajor90'] = None
-    D['SemiMinor90'] = None
-    D['ErrorStrike'] = None
+    D['SemiMajor90'] = ''
+    D['SemiMinor90'] = ''
+    D['ErrorStrike'] = ''
 
   tab.RemoveKey('LatError')
   tab.RemoveKey('LonError')
