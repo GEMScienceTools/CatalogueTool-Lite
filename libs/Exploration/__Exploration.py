@@ -21,6 +21,7 @@ import Selection as Sel
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
 
 #-----------------------------------------------------------------------------------------
 
@@ -286,3 +287,59 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   if OutFile:
     plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
 
+#-----------------------------------------------------------------------------------------
+
+def DuplicateCheck(Log, Tmax=[], Smax=[],
+                        Tnum=[], Snum=[],
+                        Smooth=[],
+                        OutFile=[]):
+  """
+  """
+
+  dT = [I[4] for I in Log if I[4] > 0]
+  dS = [I[5] for I in Log if I[5] > 0]
+
+  if not Tmax:
+    Tmax = np.max(dT)
+  if not Smax:
+    Smax = np.max(dS)
+  if not Tnum:
+    Tnum = 100
+  if not Snum:
+    Snum = 100
+
+  XBins = np.linspace(0, Tmax, Tnum)
+  YBins = np.linspace(0, Smax, Snum)
+
+  H = np.histogram2d(dT, dS, [YBins, XBins])
+
+  def Gaussian(Size,Sigma):
+    x = np.arange(0, Size[0], 1, float)
+    y = np.arange(0, Size[1], 1, float)
+    Gx = np.exp(-(x-Size[0]/2)**2/Sigma[0]**2)
+    Gy = np.exp(-(y-Size[1]/2)**2/Sigma[1]**2)
+    return np.outer(Gy,Gx)
+
+  if any(Smooth):
+    #kern = np.ones((Smooth,Smooth))/Smooth
+    kern = Gaussian((Tnum,Snum),Smooth)
+    H0 = sp.signal.convolve2d(H[0], kern, mode='same')
+  else:
+    H0 = H[0]
+
+  # Plot time histogram
+  fig = plt.figure(figsize=(5, 5))
+
+  plt.pcolor(XBins, YBins, H0, cmap='Purples')
+
+  plt.xlabel('Time', fontsize=12, fontweight='bold')
+  plt.ylabel('Distance', fontsize=12, fontweight='bold')
+
+  plt.grid('on')
+
+  plt.tight_layout()
+
+  plt.show(block=False)
+
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
