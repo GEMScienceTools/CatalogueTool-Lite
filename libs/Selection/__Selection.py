@@ -305,7 +305,8 @@ def MergeDuplicate(DbA, DbB=[],
                         Swin=50.,
                         Unit='Second',
                         Owrite=True,
-                        Log=False):
+                        Log=False,
+                        LogFile=[]):
 
   if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
     print 'Warning: time unit not recognized'
@@ -405,6 +406,18 @@ def MergeDuplicate(DbA, DbB=[],
       return Db0, LogE
     else:
       return Db0
+
+  if LogFile:
+    # Open input ascii file
+    with open(LogFile, 'w') as f:
+      for L in LogE:
+        f.write('{0},{1},'.format(L[0],L[1]))
+        f.write('{0},{1},'.format(L[2],L[3]))
+        f.write('{0},{1}\n'.format(L[4],L[5]))
+      f.close()
+      return
+    # Warn user if model file does not exist
+    print 'Cannot open file'
 
 #-----------------------------------------------------------------------------------------
 
