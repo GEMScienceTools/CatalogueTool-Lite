@@ -266,3 +266,100 @@ class Database(Cat.Database):
 
     # Warn user if model file does not exist
     print 'File not found.'
+
+  #---------------------------------------------------------------------------------------
+
+  def ImportSeisan(self, file_name):
+
+    def _GetLocation(EventStr):
+      L = {}
+      if EventStr:
+        L['Year'] = EventStr[1:5].strip(' ')
+        L['Month'] = EventStr[6:8].strip(' ')
+        L['Day'] = EventStr[8:10].strip(' ')
+        L['Hour'] = EventStr[11:13].strip(' ')
+        L['Minute'] = EventStr[13:15].strip(' ')
+        L['Second'] = EventStr[16:20].strip(' ')
+        L['SecError'] = EventStr[51:55].strip(' ')
+        L['Latitude'] = EventStr[23:30].strip(' ')
+        L['Longitude'] = EventStr[30:38].strip(' ')
+        L['Depth'] = EventStr[38:43].strip(' ')
+        L['LocCode'] = EventStr[45:48].strip(' ')
+      return L
+
+    def _GetMagnitude(EventStr, MagN):
+      if MagN == 1: dI = 0
+      if MagN == 2: dI = 8
+      if MagN == 3: dI = 16
+      M = {}
+      if EventStr:
+        M['MagSize'] = EventStr[55+dI:59+dI].strip(' ')
+        M['MagType'] = EventStr[59+dI].strip(' ')
+        M['MagCode'] = EventStr[60+dI:63+dI].strip(' ')
+        if M['MagType'] == 'L':
+          M['MagType'] = 'ML'
+        if M['MagType'] == 'b':
+          M['MagType'] = 'mb'
+        if M['MagType'] == 'B':
+          M['MagType'] = 'mB'
+        if M['MagType'] == 's':
+          M['MagType'] = 'Ms'
+        if M['MagType'] == 'S':
+          M['MagType'] = 'MS'
+        if M['MagType'] == 'W':
+          M['MagType'] = 'MW'
+        if M['MagType'] == 'G':
+          M['MagType'] = 'MbLg'
+        if M['MagType'] == 'C':
+          M['MagType'] = 'Mc'
+        if M['MagType'] == 'D':
+          M['MagType'] = 'Md'
+
+      return M
+
+    def _GetMagBlock(EventStr):
+      M = []
+      for N in [1,2,3]:
+        M0 = _GetMagnitude(EventStr,N)
+        if M0['MagSize']:
+          M.append(M0)
+      return M
+
+    def _GetLog(EventStr):
+      O = ''
+      if EventStr:
+        S = EventStr[10].strip(' ')
+        if S: O += 'FIXT({0});'.format(S)
+        S = EventStr[20].strip(' ')
+        if S: O += 'LMI({0});'.format(S)
+        S = EventStr[43].strip(' ')
+        if S: O += 'DIND({0});'.format(S)
+        S = EventStr[45:48].strip(' ')
+        if S: O += 'HYPA({0});'.format(S)
+        S = EventStr[48:51].strip(' ')
+        if S: O += 'STAN({0});'.format(S)
+      return O
+
+    # Open SEISAN file
+    with open(file_name, 'r') as f:
+
+      I = 0
+      while True:
+
+        EventStr = f.readline().strip('\n')
+
+        if not EventStr: break
+        if EventStr[79] == '1':
+
+          I += 1
+          L = _GetLocation(EventStr)
+          M = _GetMagBlock(EventStr)
+          O = _GetLog(EventStr)
+
+          self.AddEvent(I, L, M, O)
+
+      f.close()
+      return
+
+    # Warn user if model file does not exist
+    print 'File not found.'
