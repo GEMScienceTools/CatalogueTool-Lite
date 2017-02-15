@@ -336,27 +336,42 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def Sort(self):
+  def Sort(self, Key='Time', Owrite=True):
 
-    Sec = []
-    for E in self.Events:
-      L = E['Location'][0]
-      S = CU.DateToSec(L['Year'],
-                       L['Month'],
-                       L['Day'],
-                       L['Hour'],
-                       L['Minute'],
-                       L['Second'])
-      Sec.append(S)
+    if Key == 'Time':
+      Value = []
+      for E in self.Events:
+        L = E['Location'][0]
+        S = CU.DateToSec(L['Year'],
+                         L['Month'],
+                         L['Day'],
+                         L['Hour'],
+                         L['Minute'],
+                         L['Second'])
+        Value.append(S)
+        Rev = False
+
+    if Key == 'Magnitude':
+      Value = []
+      for E in self.Events:
+        M = E['Magnitude'][0]['MagSize']
+        Value.append(M)
+        Rev = True
 
     # Get indexes of the sorted list
-    Ind = sorted(range(len(Sec)), key=lambda k: Sec[k])
+    Ind = sorted(range(len(Value)), key=lambda k: Value[k], reverse=Rev)
 
     Events = []
     for I in Ind:
       Events.append(self.Events[I])
 
-    self.Events = cp.deepcopy(Events)
+    if Owrite:
+      self.Events = cp.deepcopy(Events)
+    else:
+      Out = Database()
+      Out.Header = cp.deepcopy(self.Header)
+      Out.Events = cp.deepcopy(Events)
+      return Out
 
   #---------------------------------------------------------------------------------------
 

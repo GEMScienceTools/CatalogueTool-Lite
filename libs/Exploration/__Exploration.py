@@ -21,7 +21,7 @@ import Selection as Sel
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy as sc
+import scipy.signal as sig
 
 #-----------------------------------------------------------------------------------------
 
@@ -320,12 +320,10 @@ def DuplicateCheck(Log, Tmax=[], Smax=[],
     Gy = np.exp(-(y-Size[1]/2)**2/Sigma[1]**2)
     return np.outer(Gy,Gx)
 
-  from scipy import signal
-
   if any(Smooth):
     #kern = np.ones((Smooth,Smooth))/Smooth
     kern = Gaussian((Tnum,Snum),Smooth)
-    H0 = sc.signal.convolve2d(H[0], kern, mode='same')
+    H0 = sig.convolve2d(H[0], kern, mode='same')
   else:
     H0 = H[0]
 

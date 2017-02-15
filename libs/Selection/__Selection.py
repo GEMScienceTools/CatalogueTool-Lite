@@ -344,9 +344,8 @@ def MergeDuplicate(DbA, DbB=[],
     return S
 
   def GetCoor(Event):
-    L = Event['Location'][0]
-    X = L['Longitude']
-    Y = L['Latitude']
+    X = Event['Location'][0]['Longitude']
+    Y = Event['Location'][0]['Latitude']
     return [X, Y]
 
   def DeltaSec(S0, S1):
@@ -356,6 +355,8 @@ def MergeDuplicate(DbA, DbB=[],
   def DeltaLen(C0, C1):
     Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
     return Dis
+
+  #---------------------------------------------------------------------------------------
 
   Db0 = DbA.Copy()
   Db1 = DbB.Copy() if DbB else DbA.Copy()
