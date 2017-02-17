@@ -21,6 +21,53 @@ import numpy as np
 import scipy.optimize as spo
 import matplotlib.pyplot as plt
 
+import Selection as Sel
+
+#-----------------------------------------------------------------------------------------
+
+def GetEventRates(Db, CompTable, Area=1.):
+  """
+  Method to compute observed annual rates (incremental and cumulative) from a given
+  completeness table. In this implementation, completeness is one window per
+  magnitude bin in M. Example:
+  CompTable = [[4.50, 0.25, 2000., 2013.],
+               [4.75, 0.25, 1980., 2013.],
+               [5.00, 0.25, 1970., 2013.],
+               [5.25, 0.25, 1960., 2013.],
+               [5.50, 0.50, 1950., 2013.],
+               [6.00, 1.50, 1901., 2013.]]
+  """
+
+  IncR = []
+  Data = [[],[]]
+
+  for CT in CompTable:
+
+    MinM = CT[0]
+    MaxM = CT[0]+CT[1]
+    MinY = CT[2]
+    MaxY = CT[3]
+
+    # Catalogue selection (Magnitude-Year)
+    DbM = Sel.MagRangeSelect(Db, MinM, MaxM)
+    DbY = Sel.TimeSelect(DbM, MinY, MaxY)
+
+    # Computing incremental rates
+    RY = float(DbY.Size())/float(MaxY-MinY)
+    IncR.append(RY/float(Area))
+
+    # Data per magnitude bin
+    Data[0].append(DbY.Extract(Key='Year'))
+    Data[1].append(DbY.Extract(Key='MagSize'))
+
+  # Cumulative distribution
+  CumR = np.cumsum(IncR[::-1])[::-1]
+
+  Mag = [m[0] for m in CompTable]
+  dMag = [m[1] for m in CompTable]
+
+  return IncR, CumR, Mbin, Minc, Data
+
 #-----------------------------------------------------------------------------------------
 
 def MfdCum(a, b, Mbin, Mmax):
@@ -126,13 +173,7 @@ def MfdOptimFun(Enum, Mbin, Minc, Mmax, Merr=[], a0=[], b0=[], bfix=[]):
 #-------------------------------------------
 # Plot results
 
-def mfd_plot(R, M, dM, Mmax, a, b, fig_file=[]):
-
-  # Settings
-  from matplotlib import rcParams
-  rcParams['font.family'] = 'Times New Roman'
-  rcParams['font.size'] = 16
-  rcParams['axes.linewidth'] = 1.5
+def MfdPlot(a, b, Mmax, Rate=[], Mbin=[], Minc=[], OutFile=[]):
 
   # Variable Init.
   M = np.array(M)

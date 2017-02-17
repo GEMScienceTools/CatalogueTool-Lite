@@ -27,6 +27,7 @@ import CatUtils as CU
 #-----------------------------------------------------------------------------------------
 
 def GardnerKnopoff(M):
+
   Swin = 10**(0.1238*M+0.983)
   if M >= 6.5:
     Twin = 10.**(0.032*M+2.7389)*84600.
@@ -35,6 +36,7 @@ def GardnerKnopoff(M):
   return Twin, Swin
 
 def Grunthal(M):
+
   Swin = np.exp(1.77+(0.037+1.02*M)**2)
   if M >= 6.5:
     Twin = np.exp(-3.95+(0.62+17.32*M)**2)*84600.
@@ -43,6 +45,7 @@ def Grunthal(M):
   return Twin, Swin
 
 def Uhrhammer(M):
+
   Swin = np.exp(-1.024+0.804*M)
   Twin = np.exp(-2.87+1.235*M)*84600.
   return Twin, Swin
@@ -81,13 +84,6 @@ def WindowSearch(Db, WinFun=GardnerKnopoff):
     Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
     return Dis
 
-  def WhichShock(T0, T1):
-    if T1 > T0:
-      Type = 'AS'
-    else:
-      Type = 'FS'
-    return Type
-
   def LogInfo(Type, Event, dT, dC):
     L = []
     L.append(Type)
@@ -101,55 +97,67 @@ def WindowSearch(Db, WinFun=GardnerKnopoff):
 
   #---------------------------------------------------------------------------------------
 
-  DbS = Db.Sort(Key='Magnitude', Owrite=0)
-  Ind = np.zeros(DbS.Size())
-
   Events = []
   Log = []
 
-  for J, E0 in enumerate(DbS.Events[:-1]):
-    if not Ind[J]:
-      T0 = GetDate(E0)
-      C0 = GetCoor(E0)
-      M0 = GetSize(E0)
+  DbM = Db.Sort(Key='Magnitude', Owrite=0)
+  Enum = DbM.Size()
 
-      Twin, Swin = WinFun(M0)
+  T0 = [0]*Enum
+  S0 = [0]*Enum
+  Tw = [0]*Enum
+  Sw = [0]*Enum
+  In = [0]*Enum
 
+  for I in range(0,Enum):
+
+    E0 = DbM.Events[I]
+    T0[I] = GetDate(E0)
+    S0[I] = GetCoor(E0)
+    Tw[I], Sw[I] = WinFun(GetSize(E0))
+
+  for I in range(0,Enum):
+    if not In[I]:
+
+      E0 = DbM.Events[I]
       Events.append(E0)
-
       Log.append([])
       Log[-1].append(LogInfo('MS', E0, 0, 0))
 
-      for I, E1 in enumerate(DbS.Events[J+1:]):
-        if not Ind[I+J+1]:
-          T1 = GetDate(E1)
-          C1 = GetCoor(E1)
+      for J in range(I+1,Enum):
+        if not In[J]:
 
-          dC = DeltaLen(C0, C1)
-          dT = DeltaSec(T0, T1)
+          E1 = DbM.Events[J]
 
-          if dC <= Swin and dT <= Twin:
-            Ind[I+J+1] = 1
-            Type = WhichShock(T0, T1)
-            Log[-1].append(LogInfo(Type, E1, dT, dC))
+          dT = DeltaSec(T0[I], T0[J])
+          if dT < Tw[I]:
 
-  DbS.Events = Events
-  DbS.Sort()
+            dS = DeltaLen(S0[I], S0[J])
+            if dS < Sw[I]:
 
-  return DbS, Log
+              if T0[J] > T0[I]:
+                Log[-1].append(LogInfo('AS', E1, dT, dS))
+              else:
+                Log[-1].append(LogInfo('FS', E1, dT, dS))
+              In[J] = 1
+
+  DbM.Events = Events
+  DbM.Sort()
+
+  return DbM, Log
 
 #-----------------------------------------------------------------------------------------
 
-def PlotLog(Log):
+def PlotLog(Log, OutFile=[]):
   """
-  For Debug
+  Presently only for Debug
   """
 
   FS = [[],[]]
   AS = [[],[]]
   MS = [[],[]]
 
-  plt.figure()
+  fig = plt.figure(figsize=(5, 5))
 
   for L in Log:
     if len(L) > 1:
@@ -168,4 +176,14 @@ def PlotLog(Log):
   plt.plot(FS[0], FS[1], 'g.', markersize=2)
   plt.plot(MS[0], MS[1], 'r*', markersize=3)
 
+  plt.xlabel('Longitude', fontsize=12, fontweight='bold')
+  plt.ylabel('Latitude', fontsize=12, fontweight='bold')
+
+  plt.grid('on')
+
+  plt.tight_layout()
+
   plt.show(block=False)
+
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)

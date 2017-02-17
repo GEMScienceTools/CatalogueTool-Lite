@@ -188,15 +188,15 @@ def KeyTimeHisto(Db, Code, Key=[],
 
 #-----------------------------------------------------------------------------------------
 
-def MagTimeHisto(Db, Mag0=[], Mag1=[], Bin=0.5,
-                     Year0=[], Year1=[], Delta=5,
-                     OutFile=[]):
+def MagTimeBars(Db, Mag0=[], Mag1=[], MBin=0.5,
+                    Year0=[], Year1=[], Delta=5,
+                    OutFile=[]):
 
   if not Mag0:
     Mag0 = min(Db.Extract('MagSize'))
   if not Mag1:
     Mag1 = max(Db.Extract('MagSize'))
-  MBins = np.arange(Mag0, Mag1+Bin, Bin)
+  MBins = np.arange(Mag0, Mag1+MBin, MBin)
 
   if not Year0:
     Year0 = min(Db.Extract('Year'))
@@ -217,7 +217,6 @@ def MagTimeHisto(Db, Mag0=[], Mag1=[], Bin=0.5,
 
     X = YBins[:-1]
     Y = YHist
-
 
     if any(Y):
       plt.bar(X, Y, Delta, color=[C,C,C],
@@ -246,6 +245,7 @@ def MagTimeHisto(Db, Mag0=[], Mag1=[], Bin=0.5,
 
 def MagTimePlot(Db, Mag0=[], Mag1=[],
                     Year0=[], Year1=[],
+                    CompTable=[], 
                     OutFile=[]):
 
   if not Mag0:
@@ -271,12 +271,17 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
                   markeredgecolor=[0,0,0],
                   markeredgewidth=1.5)
 
+  # Plot completeness
+  if CompTable:
+    PlotCompTable(CompTable)
+
   plt.gca().yaxis.grid(color='0.',linestyle='-')
   plt.gca().xaxis.grid(color='0.65',linestyle='--')
 
   plt.gca().xaxis.set_ticks_position('none')
   plt.gca().yaxis.set_ticks_position('none')
 
+  plt.title('Time-Magnitude Distribution', fontsize=14, fontweight='bold')
   plt.xlabel('Years', fontsize=14, fontweight='bold')
   plt.ylabel('Magnitude', fontsize=14, fontweight='bold')
 
@@ -286,6 +291,84 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
 
   if OutFile:
     plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+
+#-----------------------------------------------------------------------------------------
+
+def RateDensityPlot(Db, Mag0=[], Mag1=[], MBin=0.25,
+                        Year0=[], Year1=[], Delta=2,
+                        CompTable=[], 
+                        Normalise=True,
+                        OutFile=[]):
+
+  if not Mag0:
+    Mag0 = min(Db.Extract('MagSize'))
+  if not Mag1:
+    Mag1 = max(Db.Extract('MagSize'))
+  MBins = np.arange(Mag0, Mag1+MBin, MBin)
+
+  if not Year0:
+    Year0 = min(Db.Extract('Year'))
+  if not Year1:
+    Year1 = max(Db.Extract('Year'))
+  YBins = np.arange(Year0, Year1+Delta, Delta)
+
+  Histo = np.zeros((np.size(MBins), np.size(YBins)))
+
+  # Catalogue selection (Magnitude-Year)
+  DbM = Sel.MagRangeSelect(Db, Mag0, Mag1)
+  DbY = Sel.TimeSelect(DbM, Year0, Year1)
+
+  M = DbY.Extract('MagSize')
+  Y = DbY.Extract('Year')
+
+  Hist = np.histogram2d(Y, M, bins=(YBins, MBins))[0]
+  Hist = np.transpose(Hist)
+
+  if Normalise:
+    for I in range(0,len(Hist)):
+      Max = np.max(Hist[I])
+      if Max > 0:
+        Hist[I] = Hist[I]/Max
+
+  # Plot
+  plt.figure(figsize=(8, 4))
+
+  plt.pcolormesh(YBins, MBins, Hist, cmap='Greys', vmin=0)
+
+  # Plot completeness
+  if CompTable:
+    PlotCompTable(CompTable)
+
+  plt.gca().xaxis.grid(color='0.65',linestyle='--')
+  plt.gca().yaxis.grid(color='0.',linestyle='-')
+
+  plt.gca().xaxis.set_ticks_position('none')
+  plt.gca().yaxis.set_ticks_position('none')
+
+  plt.title('Occurrence Rate Density', fontsize=14, fontweight='bold')
+  plt.xlabel('Years', fontsize=12, fontweight='bold')
+  plt.ylabel('Magnitude', fontsize=12, fontweight='bold')
+
+  plt.gca().xaxis.grid(color='0.65',linestyle='-')
+  plt.gca().yaxis.grid(color='0.65',linestyle='-')
+
+  plt.axis([Year0, Year1, Mag0, Mag1])
+  # plt.tight_layout()
+  plt.show(block=False)
+
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+
+
+def PlotCompTable(CompTable):
+
+  for CT in CompTable:
+
+    X = [CT[2], CT[3], CT[3], CT[2], CT[2]]
+    Y = [CT[0], CT[0], CT[0]+CT[1], CT[0]+CT[1], CT[0]]
+
+    plt.plot(X, Y, 'r--', linewidth=2)
+    plt.fill(X, Y, color='y',alpha=0.1)
 
 #-----------------------------------------------------------------------------------------
 
