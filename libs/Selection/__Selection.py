@@ -453,8 +453,10 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               ms,me = ConvFun(MS,ME)
 
               # Rounding
-              ms = float(format(ms,'.2f'))
-              me = float(format(me,'.2f'))
+              if ms != None:
+                ms = float(format(ms,'.2f'))
+              if me != None:
+                me = float(format(me,'.2f'))
 
               E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
               A['MagSize'] = CU.CastValue('MagSize', ms)
