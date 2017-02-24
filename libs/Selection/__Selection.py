@@ -309,38 +309,33 @@ def MergeDuplicate(DbA, DbB=[],
                         LogFile=[]):
 
   if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
-    print 'Warning: time unit not recognized'
+    print 'Warning: not a valid time'
     return
 
   # Converting current-units to seconds
   if Unit == 'Second':
     Twin *= 1
-    Mask = (1,1,1,1,1,1)
   if Unit == 'Minute':
     Twin *= 60
-    Mask = (1,1,1,1,1,0)
   if Unit == 'Hour':
     Twin *= 60*60
-    Mask = (1,1,1,1,0,0)
   if Unit == 'Day':
     Twin *= 60*60*24
-    Mask = (1,1,1,0,0,0)
   if Unit == 'Month':
     Twin *= 60*60*24*12
-    Mask = (1,1,0,0,0,0)
   if Unit == 'Year':
     Twin *= 60*60*24*12*365
-    Mask = (1,0,0,0,0,0)
 
-  def GetDate(Event, Mask):
+  #---------------------------------------------------------------------------------------
 
+  def GetDate(Event):
     L = Event['Location'][0]
-    S = CU.DateToSec(L['Year'] or Mask[0],
-                     L['Month'] or Mask[1],
-                     L['Day'] or Mask[2],
-                     L['Hour'] or Mask[3],
-                     L['Minute'] or Mask[4],
-                     L['Second'] or Mask[5])
+    S = CU.DateToSec(L['Year'],
+                     L['Month'],
+                     L['Day'],
+                     L['Hour'],
+                     L['Minute'],
+                     L['Second'])
     return S
 
   def GetCoor(Event):
@@ -359,40 +354,65 @@ def MergeDuplicate(DbA, DbB=[],
   #---------------------------------------------------------------------------------------
 
   Db0 = DbA.Copy()
-  Db1 = DbB.Copy() if DbB else DbA.Copy()
-  End = None if DbB else -1
+  Enum0 = Db0.Size()
+  T0 = [0]*Enum0
+  S0 = [0]*Enum0
+
+  for I in range(0,Enum0):
+    E0 = Db0.Events[I]
+    T0[I] = GetDate(E0)
+    S0[I] = GetCoor(E0)
+
+  if DbB:
+    Db1 = DbB.Copy()
+    Enum1 = Db1.Size()
+    T1 = [0]*Enum1
+    S1 = [0]*Enum1
+
+    for I in range(0,Enum1):
+      E1 = Db1.Events[I]
+      T1[I] = GetDate(E1)
+      S1[I] = GetCoor(E1)
+
+  else:
+    Db1 = Db0.Copy()
+    Enum1 = Enum0
+    T1 = T0
+    S1 = S0
+
   LogE = []
   Ind = []
   Name = Db1.Header['Name']
 
-  for J, E0 in enumerate(Db0.Events[:End]):
-    T0 = GetDate(E0, Mask)
-    C0 = GetCoor(E0)
+  for I in range(0,Enum0):
+    Start = 0 if DbB else I+1
 
-    Start = 0 if DbB else J+1
+    for J in range(Start,Enum1):
+      dT = DeltaSec(T0[I], T1[J])
 
-    for I, E1 in enumerate(Db1.Events[Start:]):
-      C1 = GetCoor(E1)
-      dC = DeltaLen(C0, C1)
+      if (dT <= Twin):
+        dS = DeltaLen(S0[I], S1[J])
 
-      if (dC <= Swin):
-        T1 = GetDate(E1, Mask)
-        dT = DeltaSec(T0, T1)
+        if (dS <= Swin):
+          E0 = Db0.Events[I]
+          E1 = Db1.Events[J]
 
-        if (dT <= Twin):
           E0['Location'].extend(E1['Location'])
           E0['Magnitude'].extend(E1['Magnitude'])
-          E0['Log'] += 'MERGED({0}:{1});'.format(Name,E1['Id'])
-          LogE.append((J, E0['Id'], Start+I, E1['Id'], dT, dC))
-          Ind.append(Start+I)
+          E0['Log'] += 'MERGED({0}:{1});'.format(Name, E1['Id'])
+
+          LogE.append((I, E0['Id'], J, E1['Id'], dT, dS))
+          Ind.append(J)
 
   if DbB:
-    for I in range(0,Db1.Size()):
+    # Append non-duplicate events to catalogue A
+    for I in range(0,Enum1):
       if I not in Ind:
         Db0.Events.append(Db1.Events[I])
         Db0.Events[-1]['Log'] += 'ADDED({0});'.format(Name)
 
   else:
+    # Remove duplicated events from catalogue A
     for I in Ind:
       Db0.Events[I] = []
     Db0.Events = [e for e in Db0.Events if e]
@@ -409,7 +429,7 @@ def MergeDuplicate(DbA, DbB=[],
       return Db0
 
   if LogFile:
-    # Open input ascii file
+    # Open output ascii file
     with open(LogFile, 'w') as f:
       for L in LogE:
         f.write('{0},{1},'.format(L[0],L[1]))
@@ -418,7 +438,7 @@ def MergeDuplicate(DbA, DbB=[],
       f.close()
       return
     # Warn user if model file does not exist
-    print 'Cannot open file'
+    print 'Warning: Cannot open file'
 
 #-----------------------------------------------------------------------------------------
 
@@ -453,8 +473,10 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               ms,me = ConvFun(MS,ME)
 
               # Rounding
-              ms = float(format(ms,'.2f'))
-              me = float(format(me,'.2f'))
+              if ms != None:
+                ms = float(format(ms,'.2f'))
+              if me != None:
+                me = float(format(me,'.2f'))
 
               E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
               A['MagSize'] = CU.CastValue('MagSize', ms)
