@@ -29,9 +29,10 @@ import Catalogue as Cat
 
 class Database(Cat.Database):
 
-  def __init__(self, Name=[]):
+  def __init__(self, Name=[], Info=[]):
 
     super(Database, self).__init__(Name)
+    super(Database, self).__init__(Info)
 
   #---------------------------------------------------------------------------------------
 

@@ -404,7 +404,7 @@ def DuplicateCheck(Log, Tmax=[], Smax=[],
     return np.outer(Gy,Gx)
 
   if any(Smooth):
-    #kern = np.ones((Smooth,Smooth))/Smooth
+    # kern = np.ones((Smooth,Smooth))/Smooth
     kern = Gaussian((Tnum,Snum),Smooth)
     H0 = sig.convolve2d(H[0], kern, mode='same')
   else:

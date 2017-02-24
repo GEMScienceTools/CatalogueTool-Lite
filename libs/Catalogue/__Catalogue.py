@@ -121,6 +121,28 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
+  def DelEmpty(self, Key, Owrite=True):
+
+    if Key not in ['M','Magnitude','L','Location']:
+      print 'Error: Not a valid Key'
+      return
+
+    if Key == 'L':
+      Key = 'Location'
+    if Key == 'M':
+      Key = 'Magnitude'
+
+    DbC = self.Copy()
+    Events = [E for E in DbC.Events if E[Key]]
+
+    if Owrite:
+      self.Events = Events
+    else:
+      DbC.Events = Events
+      return DbC
+
+  #---------------------------------------------------------------------------------------
+
   def Import(self, FileName, Header=[],
                              Delimiter=',',
                              SkipLine=0,
