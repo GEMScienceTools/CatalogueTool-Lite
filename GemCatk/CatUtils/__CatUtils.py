@@ -175,16 +175,28 @@ def LeapCheck(Year):
 
   return (C0 and C1) or C2
 
+def LeapNum(Year):
+
+  N0 = (Year-1)//4
+  N1 = (Year-1)//100
+  N2 = (Year-1)//400
+
+  return N0 - N1 + N2
+
 #-----------------------------------------------------------------------------------------
 
 def DateToSec(Year, Month, Day, Hour, Minute, Second):
 
-  if not Year: Year = 1
-  if not Month: Month = 1
-  if not Day: Day = 1
-  if not Hour: Hour = 0
-  if not Minute: Minute = 0
-  if not Second: Second = 0
+  if Year < 1:
+    print 'Warning: Year must be > 1'
+    return None
+
+  if not Year: Year = 1.
+  if not Month: Month = 1.
+  if not Day: Day = 1.
+  if not Hour: Hour = 0.
+  if not Minute: Minute = 0.
+  if not Second: Second = 0.
 
   DSEC = 24.*3600.
   YDAYS = 365.
@@ -195,7 +207,7 @@ def DateToSec(Year, Month, Day, Hour, Minute, Second):
     MDAYS = [0.,31.,59.,90.,120.,151.,181.,212.,243.,273.,304.,334.]
 
   YSec = (Year-1)*YDAYS*DSEC
-  YSec += (Year//4)*DSEC
+  YSec += LeapNum(Year)*DSEC
 
   MSec = MDAYS[int(Month)-1]*DSEC
 
