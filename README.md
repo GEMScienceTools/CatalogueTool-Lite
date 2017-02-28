@@ -4,8 +4,8 @@
 
 [Contribution guidelines for this project](Logo/OQ-CATK-Logo.png)
 
-# OQ-CATK -The Earthquake Catalogue Toolkit (Lite Version)
-# *A simplified Python toolkit for earthquake catalogue manipulation*
+# OQ-CATK - (Lite Version)
+## *A simplified Python toolkit for earthquake catalogue manipulation*
 
 The toolkit consists of 9 main modules:
   * **Catalogue** - The main module for database manipulation an I/O
