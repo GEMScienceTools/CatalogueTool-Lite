@@ -1,4 +1,4 @@
-<img alt="OQ-CATK - The Earthquake Catalogue Toolkit (Lite Version)" class="right" style="width: 60%" src="https://https://raw.githubusercontent.com/klunk386/CatalogueTool-Lite/master/Logo/Base/OQ-Logo.png" />
+<img alt="OQ-CATK - The Earthquake Catalogue Toolkit (Lite Version)" class="right" style="width: 60%" src="https://raw.githubusercontent.com/klunk386/CatalogueTool-Lite/master/Logo/Base/OQ-Logo.png" />
 
 [![TravisCI Status](https://travis-ci.org/obspy/obspy.svg?branch=master)](https://travis-ci.org/obspy/obspy)
 [![AppVeyor Status](https://ci.appveyor.com/api/projects/status/xqrbaj9phjm6l2vw/branch/master?svg=true)](https://ci.appveyor.com/project/obspy/obspy)
