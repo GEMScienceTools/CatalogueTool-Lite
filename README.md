@@ -8,10 +8,6 @@
 
 A simplified Python toolkit for earthquake catalogue manipulation and homogenisation
 
-OQ-CATK is licensed under the GNU Affero General Public License (AGPL) v3.0.
-
-### Toolkit Structure
-
 The toolkit consists of 9 main modules:
   * **Catalogue** - The main module for database manipulation an I/O
   * **Parsers** - Ad-hoc parsers for specific catalogues and bulletins (ISC, GCMT...)
@@ -22,6 +18,14 @@ The toolkit consists of 9 main modules:
   * **MapTools** - Utility to plot earthquake databases on a map
   * **IscWeb** - API to download isf catalogues from the ISC web
   * **IscCode** - ISC agency code list
+
+### Dependencies
+
+OQ-CATK requires the following dependencies:
+
+  * [NumPy/Scipy](http://www.scipy.org/)
+  * [Matplotlib](http://matplotlib.org/)
+  * [Basemap](http://matplotlib.org/basemap/)
 
 ### License
 
