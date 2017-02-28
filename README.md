@@ -5,7 +5,12 @@
 [Contribution guidelines for this project](Logo/OQ-CATK-Logo.png)
 
 # OQ-CATK - (Lite Version)
+
 ## *A simplified Python toolkit for earthquake catalogue manipulation*
+
+OQ-CATK is licensed under the GNU Affero General Public License (AGPL) v3.0.
+
+## *Toolkit Structure*
 
 The toolkit consists of 9 main modules:
   * **Catalogue** - The main module for database manipulation an I/O
