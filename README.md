@@ -1,3 +1,5 @@
+<img alt="OQ-CATK - The Earthquake Catalogue Toolkit (Lite Version)" class="right" style="width: 60%" src="https://https://raw.githubusercontent.com/klunk386/CatalogueTool-Lite/master/Logo/Base/OQ-Logo.png" />
+
 [Contribution guidelines for this project](Logo/OQ-CATK-Logo.png)
 
 # CatalogueTool-Lite
