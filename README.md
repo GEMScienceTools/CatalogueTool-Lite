@@ -2,8 +2,6 @@
 
 [![AGPLv3](https://www.gnu.org/graphics/agplv3-88x31.png)](https://www.gnu.org/licenses/agpl.html)
 
-[Contribution guidelines for this project](Logo/OQ-CATK-Logo.png)
-
 # OQ-CATK (Lite Version)
 
 A simplified Python toolkit for earthquake catalogue manipulation and homogenisation
