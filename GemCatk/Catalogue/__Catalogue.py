@@ -121,24 +121,20 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def DelEmpty(self, Key, Owrite=True):
-
-    if Key not in ['M','Magnitude','L','Location']:
-      print 'Error: Not a valid Key'
-      return
-
-    if Key == 'L':
-      Key = 'Location'
-    if Key == 'M':
-      Key = 'Magnitude'
+  def DelEmpty(self, Key, All=False, Owrite=True):
 
     DbC = self.Copy()
-    Events = [E for E in DbC.Events if E[Key]]
+
+    if Key in ['Magnitude','Location']:
+      DbC.Events = [E for E in DbC.Events if E[Key]]
+
+    else:
+      DbC.Filter(Key, [], Opr='!=')
+      DbC.Filter(Key, None, Opr='!=')
 
     if Owrite:
-      self.Events = Events
+      self.Events = DbC.Events
     else:
-      DbC.Events = Events
       return DbC
 
   #---------------------------------------------------------------------------------------
