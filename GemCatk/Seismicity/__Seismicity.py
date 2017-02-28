@@ -21,7 +21,7 @@ import numpy as np
 import scipy.optimize as spo
 import matplotlib.pyplot as plt
 
-import Selection as Sel
+import GemCatk.Selection as Sel
 
 #-----------------------------------------------------------------------------------------
 

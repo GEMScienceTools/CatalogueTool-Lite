@@ -26,8 +26,8 @@ import math as ma
 import copy as cp
 import cPickle as pk
 
-import AsciiTools as AT
-import CatUtils as CU
+import GemCatk.AsciiTools as AT
+import GemCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
-  def DelEmpty(self, Key, All=False, Owrite=True):
+  def DelEmpty(self, Key, Owrite=True):
 
     DbC = self.Copy()
 
