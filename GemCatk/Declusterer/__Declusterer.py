@@ -21,8 +21,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math as ma
 
-import Catalogue as Cat
-import CatUtils as CU
+import GemCatk.Catalogue as Cat
+import GemCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 

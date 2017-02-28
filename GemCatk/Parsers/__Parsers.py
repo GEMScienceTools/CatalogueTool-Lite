@@ -23,7 +23,7 @@ Module for Specific Catalogue Parsers
 """
 
 import math as mt
-import Catalogue as Cat
+import GemCatk.Catalogue as Cat
 
 #-----------------------------------------------------------------------------------------
 

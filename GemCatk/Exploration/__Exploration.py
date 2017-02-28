@@ -17,11 +17,11 @@
 #
 # Author: Poggi Valerio
 
-import Selection as Sel
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as sig
+
+import GemCatk.Selection as Sel
 
 #-----------------------------------------------------------------------------------------
 
