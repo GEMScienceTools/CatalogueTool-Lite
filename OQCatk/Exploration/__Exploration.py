@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as sig
 
-import OQ-Catk.Selection as Sel
+import OQCatk.Selection as Sel
 
 #-----------------------------------------------------------------------------------------
 

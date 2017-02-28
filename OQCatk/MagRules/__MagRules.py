@@ -21,7 +21,7 @@
 import math as mt
 
 #-----------------------------------------------------------------------------------------
-# Generic
+# Generic (template)
 
 def Mw_Mw_Generic(MagSize, MagError):
   """

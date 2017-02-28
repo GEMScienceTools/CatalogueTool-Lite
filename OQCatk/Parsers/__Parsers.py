@@ -23,7 +23,7 @@ Module for Specific Catalogue Parsers
 """
 
 import math as mt
-import OQ-Catk.Catalogue as Cat
+import OQCatk.Catalogue as Cat
 
 #-----------------------------------------------------------------------------------------
 

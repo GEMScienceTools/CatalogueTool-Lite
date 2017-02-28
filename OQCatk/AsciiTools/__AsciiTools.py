@@ -26,6 +26,8 @@ import copy as cp
 import numpy as np
 import fnmatch as fnm
 
+#-----------------------------------------------------------------------------------------
+
 class AsciiTable():
 
   def __init__(self, header=[]):
@@ -37,6 +39,7 @@ class AsciiTable():
 
     self.data = []
 
+  #---------------------------------------------------------------------------------------
 
   def AddElement(self, data=[]):
     """
@@ -55,6 +58,7 @@ class AsciiTable():
 
     self.data.append(newitem)
 
+  #---------------------------------------------------------------------------------------
 
   def AddKey(self, key, data=[], index=-1):
     """
@@ -80,6 +84,7 @@ class AsciiTable():
       # Add element at corresponding key
       self.data[i][key] = element
 
+  #---------------------------------------------------------------------------------------
 
   def RemoveKey(self, key):
     """
@@ -94,6 +99,7 @@ class AsciiTable():
     for i, item in enumerate(self.data):
       self.data[i].pop(key)
 
+  #---------------------------------------------------------------------------------------
 
   def RenameKey(self, old_key, new_key):
     """
@@ -108,6 +114,7 @@ class AsciiTable():
     for i, item in enumerate(self.data):
       self.data[i][new_key] = self.data[i].pop(old_key)
 
+  #---------------------------------------------------------------------------------------
 
   def Replace(self, key, old_value, new_value):
     """
@@ -126,6 +133,7 @@ class AsciiTable():
         if self.data[i][key] == old_value:
           self.data[i][key] = new_value
 
+  #---------------------------------------------------------------------------------------
 
   def Size(self):
     """
@@ -137,6 +145,7 @@ class AsciiTable():
 
     return [enum, hnum]
 
+  #---------------------------------------------------------------------------------------
 
   def Import(self, ascii_file,
                    header=[],
@@ -202,6 +211,7 @@ class AsciiTable():
     # Warn user if model file does not exist
     print 'File not found.'
 
+  #---------------------------------------------------------------------------------------
 
   def Export(self, ascii_file,
                    write_header='yes',
@@ -233,6 +243,7 @@ class AsciiTable():
     # Warn user if model file does not exist
     print 'Cannot open file.'
 
+  #---------------------------------------------------------------------------------------
 
   def Append(self, new_table):
     """
@@ -247,6 +258,7 @@ class AsciiTable():
     else:
       print 'Error: headers do not match...'
 
+  #---------------------------------------------------------------------------------------
 
   def Extract(self, key, dtype='float'):
     """
@@ -262,6 +274,7 @@ class AsciiTable():
 
     return values
 
+  #---------------------------------------------------------------------------------------
 
   def Filter(self, key, filter_key):
     """
@@ -293,6 +306,7 @@ class AsciiTable():
 
     return NewTab
 
+#-----------------------------------------------------------------------------------------
 
 def _CastValue(value, dtype='float'):
   """
@@ -325,6 +339,7 @@ def _CastValue(value, dtype='float'):
 
   return value
 
+#-----------------------------------------------------------------------------------------
 
 def _isNaN(number):
   """
@@ -333,7 +348,6 @@ def _isNaN(number):
   """
   return number != number
 
-  
 def _isEmpty(number):
   """
   Simple private method to check if a variable (list) is empty.

@@ -22,7 +22,7 @@ import numpy as np
 import scipy.optimize as spo
 import matplotlib.pyplot as plt
 
-import OQ-Catk.Selection as Sel
+import OQCatk.Selection as Sel
 
 #-----------------------------------------------------------------------------------------
 

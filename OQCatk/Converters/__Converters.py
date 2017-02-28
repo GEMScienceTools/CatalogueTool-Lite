@@ -22,7 +22,7 @@
 Module for Format Conversion
 """
 
-import OQ-Catk.AsciiTools as AT
+import OQCatk.AsciiTools as AT
 
 #-----------------------------------------------------------------------------------------
 

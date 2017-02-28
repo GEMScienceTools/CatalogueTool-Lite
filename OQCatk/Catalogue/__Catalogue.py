@@ -26,8 +26,8 @@ import math as ma
 import copy as cp
 import cPickle as pk
 
-import OQ-Catk.AsciiTools as AT
-import OQ-Catk.CatUtils as CU
+import OQCatk.AsciiTools as AT
+import OQCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 

@@ -21,8 +21,8 @@
 import copy as cp
 import math as ma
 
-import OQ-Catk.Catalogue as Cat
-import OQ-Catk.CatUtils as CU
+import OQCatk.Catalogue as Cat
+import OQCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
