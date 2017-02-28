@@ -8,14 +8,16 @@
 
 A simplified Python toolkit for earthquake catalogue manipulation and homogenisation
 
-The toolkit consists of 9 main modules:
+The toolkit consists of 11 main modules:
   * **Catalogue** - The main module for database manipulation an I/O
   * **Parsers** - Ad-hoc parsers for specific catalogues and bulletins (ISC, GCMT...)
   * **Selection** - Functions for high-level manipulation of catalogue objects
   * **Exploration** - Functions to explore database information and perform basic statistical analysis
   * **Regressor** - Utilities for magnitude conversion and catalogue homogenisation
+  * **Declusterer** - Aftershock/Foreshock removal algorithms
+  * **Seismicity** - Functions to calculate rates and occurrence relationships
   * **MagRules** - Library of magnitude conversion functions
-  * **MapTools** - Utility to plot earthquake databases on a map
+  * **MapTools** - Utility to plot earthquake datasets on a map
   * **IscWeb** - API to download isf catalogues from the ISC web
   * **IscCode** - ISC agency code list
 
