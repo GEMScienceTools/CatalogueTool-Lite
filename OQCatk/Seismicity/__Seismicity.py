@@ -26,6 +26,33 @@ import OQCatk.Selection as Sel
 
 #-----------------------------------------------------------------------------------------
 
+def TableMerge(M0, M1, Y0, Y1):
+  """
+  Utility to assemble a completeness table from arrays
+  """
+
+  CompTable = []
+
+  for m0, m1, y0, y1 in zip(M0, M1, Y0, Y1):
+    CompTable.append([m0, m1, y0, y1])
+
+  return CompTable
+
+
+def TableSplit(CompTable):
+  """
+  Utility to split a completeness table into arrays
+  """
+
+  M0 = [m[0] for m in CompTable]
+  M1 = [m[1] for m in CompTable]
+  Y0 = [m[2] for m in CompTable]
+  Y1 = [m[3] for m in CompTable]
+
+  return M0, M1, Y0, Y1
+
+#-----------------------------------------------------------------------------------------
+
 def GetEventRates(Db, CompTable, Area=1.):
   """
   Method to compute observed annual rates (incremental and cumulative) from a given
@@ -39,7 +66,7 @@ def GetEventRates(Db, CompTable, Area=1.):
                [6.00, 1.50, 1901., 2013.]]
   """
 
-  IncR = []
+  Enum = []
   Data = [[],[]]
 
   for CT in CompTable:
@@ -55,19 +82,16 @@ def GetEventRates(Db, CompTable, Area=1.):
 
     # Computing incremental rates
     RY = float(DbY.Size())/float(MaxY-MinY)
-    IncR.append(RY/float(Area))
+    Enum.append(RY/float(Area))
 
     # Data per magnitude bin
     Data[0].append(DbY.Extract(Key='Year'))
     Data[1].append(DbY.Extract(Key='MagSize'))
 
   # Cumulative distribution
-  CumR = np.cumsum(IncR[::-1])[::-1]
+  Ecum = np.cumsum(Enum[::-1])[::-1]
 
-  Mag = [m[0] for m in CompTable]
-  dMag = [m[1] for m in CompTable]
-
-  return IncR, CumR, Mbin, Minc, Data
+  return Enum, Ecum, Data
 
 #-----------------------------------------------------------------------------------------
 
@@ -130,7 +154,7 @@ def MfdFit(ab, Enum, Mbin, Minc, Mmax, Merr, bfix=[]):
 
 #-----------------------------------------------------------------------------------------
 
-def MfdOptimFun(Enum, Mbin, Minc, Mmax, Merr=[], a0=[], b0=[], bfix=[]):
+def MfdOptimize(Enum, Mbin, Minc, Mmax, Merr=[], a0=[], b0=[], bfix=[]):
   """
   Optimisation function
   Note: Minc and Merr can be single (constant) values or array
@@ -174,71 +198,43 @@ def MfdOptimFun(Enum, Mbin, Minc, Mmax, Merr=[], a0=[], b0=[], bfix=[]):
 #-------------------------------------------
 # Plot results
 
-def MfdPlot(a, b, Mmax, Rate=[], Mbin=[], Minc=[], OutFile=[]):
+def MfdPlot(a, b, Mmax, Enum=[], Mbin=[], Minc=[], OutFile=[]):
 
-  # Variable Init.
-  M = np.array(M)
-  dM = np.array(dM)
-
-  Mc = np.arange(0., Mmax, 0.01)
-
-  Nc = mfd_cum(a, b, Mc, Mmax)
-  Ni = mfd_inc(a, b, M, dM, Mmax)
+  # Convert to numpy array
+  Enum = np.array(Enum)
+  Mbin = np.array(Mbin)
+  Minc = np.array(Minc)
 
   # Plot
-  plt.figure(figsize=(5.5,4.5))
-  ax = plt.gcf().add_subplot(111)
+  plt.figure(figsize=(6,4))
 
-  # MFD Bounds
-  plt.semilogy([Mmax, Mmax],[1.e-4, 1.e+3],'r--',
-                                           linewidth=1,
-                                           zorder=1)
+  # Observed incremental rates
+  h1 = plt.bar(Mbin, Enum, Minc, edgecolor=[0,0,0],
+                                 color=[0.9,0.9,0.9],
+                                 linewidth=1,
+                                 label='Observed Incremental',
+                                 align='edge',
+                                 log=True,
+                                 zorder=1)
 
-  plt.semilogy([4.5, 4.5],[1.e-4, 1.e+3],'r--',
-                                         linewidth=1,
-                                         zorder=1)
+  # Inverted Incremental rates
+  Ninc = MfdInc(a, b, Mbin, Minc, Mmax)
+  plt.plot(Mbin+Minc/2., Ninc, 's', color=[1,1,1],
+                                    markersize=8,
+                                    markeredgecolor=[0,0,0],
+                                    linewidth=2,
+                                    label='Inverted Incremental',
+                                    zorder=3)
 
-
-  # Cumulative MFD
-  plt.semilogy(Mc, Nc, 'r',
+  # Inverted Cumulative rates
+  Maxs = np.arange(min(Mbin), Mmax, 0.0001)
+  Ncum = MfdCum(a, b, Maxs, Mmax)
+  plt.plot(Maxs, Ncum, color=[1,0,0],
                        linewidth=2,
+                       label='Inverted Cumulative',
                        zorder=2)
 
-  plt.semilogy(M, R[1], 'ro',
-                        markeredgewidth=1,
-                        markersize=8,
-                        label='Cumulative MFD',
-                        zorder=3)
-
-  # Incremental MFD
-  plt.semilogy(M+dM/2., R[0], 'ws',
-                               markeredgewidth=1,
-                               markersize=8,
-                               label='Incremental MFD',
-                               zorder=3)
-
-  ax.bar(M, Ni, dM, color=[0.9,0.9,0.9],
-                    log=True,
-                    linewidth=1,
-                    zorder=1)
-
-  plt.xlim((4., 8.))
-  plt.ylim((1.e-4, 1.e+3))
-
-  plt.text(6.25, 5e+0, 'a-value: '+'{:.2f}'.format(a),
-                    weight='bold',
-                    color='k',
-                    fontsize=14)
-  plt.text(6.25, 2e+0, 'b-value: '+'{:.2f}'.format(b),
-                    weight='bold',
-                    color='k',
-                    fontsize=14)
-  plt.text(6.25, 8e-1, 'M-max: '+'{:.2f}'.format(Mmax),
-                    weight='bold',
-                    color='k',
-                    fontsize=14)
-
-  plt.title('Gutenberg-Richter Distribution')
+  plt.title('Truncated G-R Distribution')
   plt.legend(loc=1, borderaxespad=0., numpoints=1)
 
   plt.xlabel('Magnitude')
@@ -247,8 +243,10 @@ def MfdPlot(a, b, Mmax, Rate=[], Mbin=[], Minc=[], OutFile=[]):
   plt.gca().yaxis.grid(color='0.65',linestyle='--')
   plt.tight_layout()
 
-  plt.draw()
+  plt.xlim((min(Mbin)-0.5, Mmax+0.5))
+  plt.ylim((0.01*min(Enum), 10*max(Ncum)))
+
   plt.show(block=False)
 
-  if fig_file:
-    plt.savefig(fig_file, dpi=600)
+  if OutFile:
+    plt.savefig(OutFile, bbox_inches='tight', dpi=150)
