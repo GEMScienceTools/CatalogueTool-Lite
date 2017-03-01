@@ -185,7 +185,7 @@ def KeyTimeHisto(Db, Code, Key=[],
   plt.show(block=False)
 
   if OutFile:
-    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+    plt.savefig(OutFile, bbox_inches='tight', dpi=150)
 
 #-----------------------------------------------------------------------------------------
 
@@ -240,7 +240,7 @@ def MagTimeBars(Db, Mag0=[], Mag1=[], MBin=0.5,
   plt.show(block=False)
 
   if OutFile:
-    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+    plt.savefig(OutFile, bbox_inches='tight', dpi=150)
 
 #-----------------------------------------------------------------------------------------
 
@@ -291,7 +291,7 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   plt.show(block=False)
 
   if OutFile:
-    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+    plt.savefig(OutFile, bbox_inches='tight', dpi=150)
 
 #-----------------------------------------------------------------------------------------
 
@@ -426,4 +426,4 @@ def DuplicateCheck(Log, Tmax=[], Smax=[],
   plt.show(block=False)
 
   if OutFile:
-    plt.savefig(OutFile, bbox_inches = 'tight', dpi = 150)
+    plt.savefig(OutFile, bbox_inches='tight', dpi=150)
