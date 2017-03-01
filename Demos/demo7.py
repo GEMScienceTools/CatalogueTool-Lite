@@ -2,9 +2,9 @@
 EXAMPLE 7 - Prime analysis
 """
 
-import Parsers as Par
-import Exploration as Exp
-import MapTools as Map
+from OQCatk import Parsers as Par
+from OQCatk import Exploration as Exp
+from OQCatk import MapTools as Map
 
 #-----------------------------------------------------------------------------------------
 # Import catalogue

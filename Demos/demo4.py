@@ -2,7 +2,7 @@
 EXAMPLE 4 - READING CSV CATALOGUE
 """
 
-import Catalogue as Cat
+from OQCatk import Catalogue as Cat
 
 #-----------------------------------------------------------------------------------------
 # 1) STANDARD FORMAT

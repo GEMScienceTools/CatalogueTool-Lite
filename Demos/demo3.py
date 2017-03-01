@@ -2,7 +2,7 @@
 EXAMPLE 3 - ISF CATALOGUE EXPLORATION
 """
 
-import Parsers as Par
+from OQCatk import Parsers as Par
 
 #-----------------------------------------------------------------------------------------
 # Isf parsing

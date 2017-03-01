@@ -2,8 +2,8 @@
 EXAMPLE 8 - Sort catalogue
 """
 
-import Catalogue as Cat
-import Exploration as Exp
+from OQCatk import Catalogue as Cat
+from OQCatk import Exploration as Exp
 
 #-----------------------------------------------------------------------------------------
 # Import catalogue
