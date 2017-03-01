@@ -2,7 +2,7 @@
 DOWNLOADING ISC CATALOGUE
 """
 
-from OQCatk import IscWeb as Iw
+import OQCatk.IscWeb as Iw
 
 # Search Area
 lon = [-20, 60]

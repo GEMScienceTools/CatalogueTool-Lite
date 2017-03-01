@@ -2,10 +2,10 @@
 EXAMPLE 6 - Area selection
 """
 
-from OQCatk import Catalogue as Cat
-from OQCatk import Exploration as Exp
-from OQCatk import MapTools as Map
-from OQCatk import CatUtils as Ct
+import OQCatk.Catalogue as Cat
+import OQCatk.Exploration as Exp
+import OQCatk.MapTools as Map
+import OQCatk.CatUtils as Ct
 
 #-----------------------------------------------------------------------------------------
 # Import catalogue

@@ -2,9 +2,9 @@
 EXAMPLE 9 - Parseing GCMT bulletin (Ndk format)
 """
 
-from OQCatk import Parsers as Par
-from OQCatk import Exploration as Exp
-from OQCatk import MapTools as Map
+import OQCatk.Parsers as Par
+import OQCatk.Exploration as Exp
+import OQCatk.MapTools as Map
 
 #-----------------------------------------------------------------------------------------
 # Import catalogue
