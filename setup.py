@@ -42,7 +42,7 @@ The toolkit consists of 12 main modules:
 
 setup(
     name='OQCatk',
-    version='1.0.0',
+    version='0.1.0',
     description="""A simplified Python toolkit for earthquake catalogue
                    manipulation and homogenisation""",
     long_description=README,
@@ -59,7 +59,7 @@ setup(
     maintainer='GEM Foundation',
     maintainer_email='hazard@globalquakemodel.org',
     classifiers=(
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU Affero General Public License v3',
