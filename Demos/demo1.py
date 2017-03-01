@@ -2,7 +2,7 @@
 MANUAL CREATION OF AN EARTHQUAKE DATABASE
 """
 
-import Catalogue as Cat
+import OQCatk.Catalogue as Cat
 Db = Cat.Database('First Test','NOTE: Just a test')
 
 L = [{'Year': 1960},

@@ -2,7 +2,7 @@
 EXAMPLE 4 - READING CSV CATALOGUE
 """
 
-import Catalogue as Cat
+import OQCatk.Catalogue as Cat
 
 #-----------------------------------------------------------------------------------------
 # 1) STANDARD FORMAT
