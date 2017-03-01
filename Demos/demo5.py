@@ -2,9 +2,9 @@
 EXAMPLE 5 - CATALOGUE MERGING
 """
 
-import Catalogue as Cat
-import Selection as Sel
-import MagRules as MR
+import OQCatk.Catalogue as Cat
+import OQCatk.Selection as Sel
+import OQCatk.MagRules as MR
 
 #-----------------------------------------------------------------------------------------
 # Import Catalogues
