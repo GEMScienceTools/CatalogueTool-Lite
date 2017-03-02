@@ -332,6 +332,22 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
+  def Info(self):
+
+    Size = self.Size()
+    Year = self.Extract('Year')
+    Magnitude = self.Extract('MagSize')
+    Latitude = self.Extract('Latitude')
+    Longitude = self.Extract('Longitude')
+
+    print 'Number of Events: {0}'.format(Size)
+    print 'Time Rage: ({0}, {1})'.format(min(Year), max(Year))
+    print 'Magntude Rage: ({0}, {1})'.format(min(Magnitude), max(Magnitude))
+    print 'Latitude Rage: ({0}, {1})'.format(min(Latitude), max(Latitude))
+    print 'Longitude Rage: ({0}, {1})'.format(min(Longitude), max(Longitude))
+
+  #---------------------------------------------------------------------------------------
+
   def Append(self, NewDb):
 
     for n in range(NewDb.Size()):

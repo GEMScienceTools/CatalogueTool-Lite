@@ -26,11 +26,11 @@ import OQCatk.Selection as Sel
 
 #-----------------------------------------------------------------------------------------
 
-def GetHypocenter(Db):
+def GetHypocenter(Db, All=False):
 
-  x = Db.Extract('Longitude')
-  y = Db.Extract('Latitude')
-  z = Db.Extract('Depth')
+  x = Db.Extract('Longitude', All)
+  y = Db.Extract('Latitude', All)
+  z = Db.Extract('Depth', All)
 
   return x, y, z
 
