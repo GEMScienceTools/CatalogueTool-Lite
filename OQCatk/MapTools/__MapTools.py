@@ -82,7 +82,7 @@ class GeoMap:
                         self._cfg['Bounds'][2],
                         self._cfg['Bounds'][3],
                         resolution = 'h',
-                        projection = 'merc',
+                        projection = 'tmerc',
                         epsg = 3857)
 
     # Background land
@@ -114,13 +114,13 @@ class GeoMap:
 
     self._zo += 1
     self._map.drawparallels(parallels, labels = [1,0,0,0],
-                            fontsize = 12, weight = 'normal',
-                            linewidth = 0.1,
+                            fontsize = 14, weight = 'normal',
+                            linewidth = 0.5,
                             zorder = self._zo)
     self._zo += 1
     self._map.drawmeridians(meridians, labels = [0,0,0,1],
-                            fontsize = 12, weight = 'normal',
-                            linewidth = 0.1,
+                            fontsize = 14, weight = 'normal',
+                            linewidth = 0.5,
                             zorder = self._zo)
 
   #---------------------------------------------------------------------------------------
@@ -141,14 +141,16 @@ class GeoMap:
     self._map.drawrivers(linewidth = 0.1,
                          color = 'b',
                          zorder = self._zo)
+    """
     self._zo += 1
     self._map.drawmapboundary(linewidth = 2,
                               color = 'k',
                               zorder = self._zo)
+    """
 
   #---------------------------------------------------------------------------------------
 
-  def Title(self, string, Set=['bold','k',14]):
+  def Title(self, string, Set=['bold','k',18]):
 
     plt.title(string, weight = Set[0],
                       color = Set[1],
@@ -170,7 +172,7 @@ class GeoMap:
 
   #---------------------------------------------------------------------------------------
 
-  def LabelPlot(self, Lon, Lat, Label, Set=['normal','k',10]):
+  def LabelPlot(self, Lon, Lat, Label, Set=['normal','k',14]):
 
     x, y = self._map(Lon, Lat)
 
