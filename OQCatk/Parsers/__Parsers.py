@@ -19,11 +19,13 @@
 # Author: Poggi Valerio
 
 """
-Module for Specific Catalogue Parsers
+Module for Specific Global Catalogue Parsers
 """
 
 import math as mt
 import OQCatk.Catalogue as Cat
+import OQCatk.AsciiTools as AT
+import OQCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
@@ -183,184 +185,147 @@ class Database(Cat.Database):
 
   #---------------------------------------------------------------------------------------
 
-  def ImportIgn(self, file_name):
+  def ImportIscExt  (self,file_name):
+  
+    # Defining the headers/estruture
+    Header = ['Id','LocCode','MagCode','','Year','Month','Day','Hour','Minute','Second',
+              'SecError','Longitude','Latitude','','','','Depth','DepError','MagSize',
+              'MagError']
 
-    def _GetId(EventStr):
-      I = []
-      if EventStr:
-        I = EventStr[0:12].strip(' ')
-      return I
+    def _GetMagCode(MagCode):
+        try:
+           MC = MagCode.split('|')[1]
+        except:
+           MC = ''
+        return MC
+    
+    # Open/importing ISC_GEM_EXT csv file
+    tab = AT.AsciiTable()
+    tab.Import(file_name, header=Header,
+                         delimiter=',',
+                         skipline=1,
+                         comment='#',
+                         dtype='s')
 
-    def _GetLocation(EventStr):
-      L = {}
-      if EventStr:
-        L['Year'] = EventStr[23:27].strip(' ')
-        L['Month'] = EventStr[20:22].strip(' ')
-        L['Day'] = EventStr[17:19].strip(' ')
-        L['Hour'] = EventStr[34:36].strip(' ')
-        L['Minute'] = EventStr[37:39].strip(' ')
-        L['Second'] = EventStr[40:42].strip(' ')
-        L['Latitude'] = EventStr[42:57].strip(' ')
-        L['Longitude'] = EventStr[57:72].strip(' ')
-        L['Depth'] = EventStr[72:87].strip(' ')
-        L['LocCode'] = 'IGN'
-      return L
-
-    def _GetMagnitude(EventStr):
-      M = {}
-      if EventStr:
-        M['MagSize'] = EventStr[102:117].strip(' ')
-        M['MagError'] = 0.
-        M['MagCode'] = 'IGN'
-        if EventStr[131] == '1':
-          M['MagType'] = 'MDs'
-        if EventStr[131] == '2':
-          M['MagType'] = 'MbLg'
-        if EventStr[131] == '3':
-          M['MagType'] = 'mb'
-        if EventStr[131] == '4':
-          M['MagType'] = 'mbLg'
-        if EventStr[131] == '5':
-          M['MagType'] = 'Mw'
-        if EventStr[131] == '6':
-          M['MagType'] = 'MLv'
-        if EventStr[131] == '7':
-          M['MagType'] = 'mb'
-        if EventStr[131] == '8':
-          M['MagType'] = 'mB'
-        if EventStr[131] == '9':
-          M['MagType'] = 'Mwp'
-        if EventStr[131] == '10':
-          M['MagType'] = 'MwmB'
-        if EventStr[131] == '11':
-          M['MagType'] = 'MwMwp'
-      return M
-
-    def _GetLog(EventStr):
-      O = []
-      if EventStr:
-        O = 'INFO({0});'.format(EventStr[135:-1])
-      return O
-
-    # Open IGN file
-    with open(file_name, 'r') as f:
-
-      # Read header
-      Header = f.readline().strip('\n')
-
-      while True:
-
-        EventStr = f.readline().strip('\n')
-
-        I = _GetId(EventStr)
-        L = _GetLocation(EventStr)
-        M = _GetMagnitude(EventStr)
-        O = _GetLog(EventStr)
-
-        if I:
+    for I,D in enumerate(tab.data):
+          if 'Id' in D.keys():
+             I = D['Id']
+          else:
+             I += 1            
+          # Changing the Magcode [Identifier]
+          D['MagCode'] = _GetMagCode(D['MagCode'])
+          L = CU.LocationInit()
+          M = CU.MagnitudeInit()
+      
+          for K in tab.header:
+              if K in L:
+                  L[K] = D[K]
+              if K in M:
+                  M[K] = D[K]
+          if 'Log' in D.keys():
+              O = D['Log']
+          else:
+              O = ''
           self.AddEvent(I, L, M, O)
-        else:
-          break
-
-      f.close()
-      return
+    return
 
     # Warn user if model file does not exist
     print 'File not found.'
 
   #---------------------------------------------------------------------------------------
 
-  def ImportSeisan(self, file_name):
+  def ImportIscGem  (self,file_name):
+    """
+        to import the original ISC-GEM catalogue
+    """
+  
+    # Defining the headers/estruture
+    Header = ['date','lat','lon','smajax','sminax','strike','','depth','dep_unc','','mw',
+              'mw_unc','','s','mo','fac','mo_auth','mpp','mpr','mrr','mrt','mtp','mtt',
+              'eventid']
+    
+    def _SplitDate(date):
+        Date = ''
+        Time = ''
+        string = []
+        if date:
+            string = date.split(' ')
+            Date = string[0].strip(' ')
+            Time = string[1].strip(' ')
+        return Date,Time
 
-    def _GetLocation(EventStr):
-      L = {}
-      if EventStr:
-        L['Year'] = EventStr[1:5].strip(' ')
-        L['Month'] = EventStr[6:8].strip(' ')
-        L['Day'] = EventStr[8:10].strip(' ')
-        L['Hour'] = EventStr[11:13].strip(' ')
-        L['Minute'] = EventStr[13:15].strip(' ')
-        L['Second'] = EventStr[16:20].strip(' ')
-        L['SecError'] = EventStr[51:55].strip(' ')
-        L['Latitude'] = EventStr[23:30].strip(' ')
-        L['Longitude'] = EventStr[30:38].strip(' ')
-        L['Depth'] = EventStr[38:43].strip(' ')
-        L['LocCode'] = EventStr[45:48].strip(' ')
-      return L
+    def _GetLocation(date,lat,lon,depth,dep_unc):
+        """
+        """
+        Date = ''
+        Time = ''
+        strD = []
+        strT = []
+        L = {}
+        Date,Time = _SplitDate(date)
+        
+        L['LocCode'] = 'ISC-GEM'
 
-    def _GetMagnitude(EventStr, MagN):
-      if MagN == 1: dI = 0
-      if MagN == 2: dI = 8
-      if MagN == 3: dI = 16
-      M = {}
-      if EventStr:
-        M['MagSize'] = EventStr[55+dI:59+dI].strip(' ')
-        M['MagType'] = EventStr[59+dI].strip(' ')
-        M['MagCode'] = EventStr[60+dI:63+dI].strip(' ')
-        if M['MagType'] == 'L':
-          M['MagType'] = 'ML'
-        if M['MagType'] == 'b':
-          M['MagType'] = 'mb'
-        if M['MagType'] == 'B':
-          M['MagType'] = 'mB'
-        if M['MagType'] == 's':
-          M['MagType'] = 'Ms'
-        if M['MagType'] == 'S':
-          M['MagType'] = 'MS'
-        if M['MagType'] == 'W':
-          M['MagType'] = 'MW'
-        if M['MagType'] == 'G':
-          M['MagType'] = 'MbLg'
-        if M['MagType'] == 'C':
-          M['MagType'] = 'Mc'
-        if M['MagType'] == 'D':
-          M['MagType'] = 'Md'
+        #splitting the Date
+        if Date:
+            strD = Date.split('-')
+            L['Year'] = strD[0].strip(' ')
+            L['Month'] = strD[1].strip(' ')
+            L['Day'] = strD[2].strip(' ')   
 
-      return M
+        #splitting the Time
+        if Time:
+            strT = Time.split(':')
+            L['Hour'] = strT[0].strip(' ')
+            L['Minute'] = strT[1].strip(' ')
+            L['Second'] = strT[2].strip(' ')       
 
-    def _GetMagBlock(EventStr):
-      M = []
-      for N in [1,2,3]:
-        M0 = _GetMagnitude(EventStr,N)
-        if M0['MagSize']:
-          M.append(M0)
-      return M
+        #get location
+        if lat:
+            L['Latitude'] = float(lat.strip(' '))
+        if lon:
+            L['Longitude'] = float(lon.strip(' '))        
+        if depth:
+            L['Depth'] = float(depth.strip(' '))
+        if dep_unc:
+            L['DepError'] = float(dep_unc.strip(' '))
+        return L
 
-    def _GetLog(EventStr):
-      O = ''
-      if EventStr:
-        S = EventStr[10].strip(' ')
-        if S: O += 'FIXT({0});'.format(S)
-        S = EventStr[20].strip(' ')
-        if S: O += 'LMI({0});'.format(S)
-        S = EventStr[43].strip(' ')
-        if S: O += 'DIND({0});'.format(S)
-        S = EventStr[45:48].strip(' ')
-        if S: O += 'HYPA({0});'.format(S)
-        S = EventStr[48:51].strip(' ')
-        if S: O += 'STAN({0});'.format(S)
-      return O
+    def _GetMagnitude(mw,mw_unc,s):
+        M = {}
+        if mw:
+            M['MagType'] = 'Mw' + s.strip(' ')
+            M['MagSize'] = float(mw.strip(' '))
+            M['MagError'] = float(mw_unc.strip(' '))
+            M['MagCode'] = 'ISC-GEM'
+        return M
+    
+    # Open/importing ISC_GEM csv file
+    tab = AT.AsciiTable()
+    tab.Import(file_name, header=Header,
+                         delimiter=',',
+                         skipline=0,
+                         comment='#',
+                         dtype='s')
 
-    # Open SEISAN file
-    with open(file_name, 'r') as f:
-
-      I = 0
-      while True:
-
-        EventStr = f.readline().strip('\n')
-
-        if not EventStr: break
-        if EventStr[79] == '1':
-
-          I += 1
-          L = _GetLocation(EventStr)
-          M = _GetMagBlock(EventStr)
-          O = _GetLog(EventStr)
-
-          self.AddEvent(I, L, M, O)
-
-      f.close()
-      return
-
-    # Warn user if model file does not exist
-    print 'File not found.'
+    for I,D in enumerate(tab.data):
+        if 'eventid' in D.keys():
+            I = D['eventid']
+        else:
+            I += 1            
+        
+        L = _GetLocation(D['date'],D['lat'],D['lon'],D['depth'],D['dep_unc'])
+        M = _GetMagnitude(D['mw'],D['mw_unc'],D['s'])
+      
+        for K in tab.header:
+            if K in L:
+               L[K] = D[K]
+            if K in M:
+               M[K] = D[K]
+            if 'Log' in D.keys():
+               O = D['Log']
+            else:
+               O = ''
+        self.AddEvent(I, L, M, O)
+    return 
+  #---------------------------------------------------------------------------------------

@@ -24,6 +24,11 @@ import scipy.signal as sig
 
 import OQCatk.Selection as Sel
 
+
+# Default the figure size
+DEFAULT_SIZE = (8., 6.)
+
+
 #-----------------------------------------------------------------------------------------
 
 def GetHypocenter(Db):
@@ -126,7 +131,8 @@ def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
 def KeyTimeHisto(Db, Code, Key=[],
                            Year0=[], Year1=[], Delta=5,
-                           Threshold=0, OutFile=[]):
+                           Threshold=0, FigSize=DEFAULT_SIZE,
+                           OutFile=[]):
 
   if not Year0:
     Year0 = min(Db.Extract('Year'))
@@ -144,7 +150,8 @@ def KeyTimeHisto(Db, Code, Key=[],
   if Key:
     ItL = [K for K in ItL if K in Key]
     ItD = {K:ItD[K] for K in ItL}
-
+    
+  
   for N, Agn in enumerate(ItL):
 
     DbA = Db.Filter(Code, Agn, Owrite=0)
@@ -157,7 +164,7 @@ def KeyTimeHisto(Db, Code, Key=[],
       Histo = np.vstack([Histo, NewRow[0]])
 
   # Plot time histogram
-  fig = plt.figure(figsize=(8, 5))
+  fig = plt.figure(figsize=FigSize)
 
   X = YBins
   Y = np.arange(0, len(ItL)+1)
@@ -167,8 +174,11 @@ def KeyTimeHisto(Db, Code, Key=[],
                       vmin=0,
                       vmax=np.max(Z))
 
+
   plt.xticks(X, map(str,X), rotation='45')
+  # Here we can add the number of events by Agencies
   plt.yticks(Y+0.5, ItL, rotation='horizontal')
+
   plt.margins(0)
 
   plt.gca().yaxis.tick_right()
@@ -191,12 +201,13 @@ def KeyTimeHisto(Db, Code, Key=[],
 
 def MagTimeBars(Db, Mag0=[], Mag1=[], MBin=0.5,
                     Year0=[], Year1=[], Delta=5,
-                    OutFile=[]):
+                    FigSize=DEFAULT_SIZE, OutFile=[]):
 
   if not Mag0:
     Mag0 = min(Db.Extract('MagSize'))
   if not Mag1:
     Mag1 = max(Db.Extract('MagSize'))
+
   MBins = np.arange(Mag0, Mag1+MBin, MBin)
 
   if not Year0:
@@ -205,7 +216,7 @@ def MagTimeBars(Db, Mag0=[], Mag1=[], MBin=0.5,
     Year1 = max(Db.Extract('Year'))
   YBins = np.arange(Year0, Year1+Delta, Delta)
 
-  plt.figure(figsize=(8, 4))
+  plt.figure(figsize=FigSize)
 
   for C,MB in enumerate(MBins):
 
@@ -247,7 +258,7 @@ def MagTimeBars(Db, Mag0=[], Mag1=[], MBin=0.5,
 def MagTimePlot(Db, Mag0=[], Mag1=[],
                     Year0=[], Year1=[],
                     CompTable=[], 
-                    OutFile=[]):
+                     FigSize=DEFAULT_SIZE, OutFile=[]):
 
   if not Mag0:
     Mag0 = min(Db.Extract('MagSize'))
@@ -265,7 +276,7 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   X = DbS.Extract('Year')
   Y = DbS.Extract('MagSize')
 
-  plt.figure(figsize=(8, 4))
+  plt.figure(figsize=FigSize)
 
   plt.plot(X, Y, 'o',markersize=3,
                   color=[0,0,0],
@@ -299,7 +310,7 @@ def RateDensityPlot(Db, Mag0=[], Mag1=[], MBin=0.25,
                         Year0=[], Year1=[], Delta=2,
                         CompTable=[], 
                         Normalise=True,
-                        OutFile=[]):
+                         FigSize=DEFAULT_SIZE, OutFile=[]):
 
   if not Mag0:
     Mag0 = min(Db.Extract('MagSize'))
@@ -332,7 +343,7 @@ def RateDensityPlot(Db, Mag0=[], Mag1=[], MBin=0.25,
         Hist[I] = Hist[I]/Max
 
   # Plot
-  plt.figure(figsize=(8, 4))
+  plt.figure(figsize=FigSize)
 
   plt.pcolormesh(YBins, MBins, Hist, cmap='Greys', vmin=0)
 
@@ -376,7 +387,7 @@ def PlotCompTable(CompTable):
 def DuplicateCheck(Log, Tmax=[], Smax=[],
                         Tnum=[], Snum=[],
                         Smooth=[],
-                        OutFile=[]):
+                         FigSize=DEFAULT_SIZE, OutFile=[]):
   """
   """
 
@@ -412,7 +423,7 @@ def DuplicateCheck(Log, Tmax=[], Smax=[],
     H0 = H[0]
 
   # Plot time histogram
-  fig = plt.figure(figsize=(5, 5))
+  fig = plt.figure(figsize=FigSize)
 
   plt.pcolor(XBins, YBins, H0, cmap='Purples')
 
