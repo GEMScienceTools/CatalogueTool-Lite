@@ -159,57 +159,59 @@ class AsciiTable():
     """
 
     # Open input ascii file
-    with open(ascii_file, 'r') as f:
+    try:
+      with open(ascii_file, 'r') as f:
 
-      # Ignore initial line(s) if necessary
-      for i in range(0, skipline):
-        f.readline()
+        # Ignore initial line(s) if necessary
+        for i in range(0, skipline):
+          f.readline()
 
-      # Import header (skip comments)
-      if not header:
-        while 1:
-          line = f.readline()
-          if line[0] != comment: break
-        header = line.strip().split(delimiter)
+        # Import header (skip comments)
+        if not header:
+          while 1:
+            line = f.readline()
+            if line[0] != comment: break
+          header = line.strip().split(delimiter)
 
-      # Removing empty fields from header
-      for h in header:
-        if h != '':
-          self.header.append(h)
+        # Removing empty fields from header
+        for h in header:
+          if h != '':
+            self.header.append(h)
 
-      # Loop over lines
-      for line in f:
+        # Loop over lines
+        for line in f:
 
-         # Skip comments, if any
-        if line[0] != comment:
-          value = line.strip().split(delimiter)
+           # Skip comments, if any
+          if line[0] != comment:
+            value = line.strip().split(delimiter)
 
-          # Loop over data values
-          data = []
-          for i, h in enumerate(header):
+            # Loop over data values
+            data = []
+            for i, h in enumerate(header):
 
-            # Skip empty header fields
-            if h != '':
+              # Skip empty header fields
+              if h != '':
 
-              # Data type(s) switch
-              if type(dtype) == list:
-                dtp = dtype[i]
-              else:
-                dtp = dtype
+                # Data type(s) switch
+                if type(dtype) == list:
+                  dtp = dtype[i]
+                else:
+                  dtp = dtype
 
-              # Check for empty elements
-              if not value[i]:
-                value[i] = empty
+                # Check for empty elements
+                if not value[i]:
+                  value[i] = empty
 
-              data.append(_CastValue(value[i],dtp))
+                data.append(_CastValue(value[i],dtp))
 
-          self.AddElement(data)
+            self.AddElement(data)
 
-      f.close()
-      return
+        f.close()
+        return
 
-    # Warn user if model file does not exist
-    print 'File not found.'
+    except:
+      # Warn user if model file does not exist
+      print 'File not found.'
 
   #---------------------------------------------------------------------------------------
 
