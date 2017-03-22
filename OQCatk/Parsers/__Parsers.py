@@ -24,6 +24,8 @@ Module for Specific Catalogue Parsers
 
 import math as mt
 import OQCatk.Catalogue as Cat
+import OQCatk.AsciiTools as AT
+import OQCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
@@ -31,8 +33,7 @@ class Database(Cat.Database):
 
   def __init__(self, Name=[], Info=[]):
 
-    super(Database, self).__init__(Name)
-    super(Database, self).__init__(Info)
+    super(Database, self).__init__(Name=Name, Info=Info)
 
   #---------------------------------------------------------------------------------------
 
@@ -270,97 +271,46 @@ class Database(Cat.Database):
 
   #---------------------------------------------------------------------------------------
 
-  def ImportSeisan(self, file_name):
+  def ImportIscGemExt(self, file_name):
+  
+    # Defining the headers/estruture
+    Header = ['Id','LocCode','MagCode','','Year','Month','Day','Hour','Minute','Second',
+              'SecError','Longitude','Latitude','','','','Depth','DepError','MagSize',
+              'MagError']
 
-    def _GetLocation(EventStr):
-      L = {}
-      if EventStr:
-        L['Year'] = EventStr[1:5].strip(' ')
-        L['Month'] = EventStr[6:8].strip(' ')
-        L['Day'] = EventStr[8:10].strip(' ')
-        L['Hour'] = EventStr[11:13].strip(' ')
-        L['Minute'] = EventStr[13:15].strip(' ')
-        L['Second'] = EventStr[16:20].strip(' ')
-        L['SecError'] = EventStr[51:55].strip(' ')
-        L['Latitude'] = EventStr[23:30].strip(' ')
-        L['Longitude'] = EventStr[30:38].strip(' ')
-        L['Depth'] = EventStr[38:43].strip(' ')
-        L['LocCode'] = EventStr[45:48].strip(' ')
-      return L
+    def _GetMagCode(MagCode):
+        try:
+           MC = MagCode.split('|')[1]
+        except:
+           MC = MagCode
+        return MC
+    
+    # Open/importing ISC_GEM_EXT csv file
+    tab = AT.AsciiTable()
+    tab.Import(file_name, header=Header,
+                         delimiter=',',
+                         skipline=1,
+                         comment='#',
+                         dtype='s')
 
-    def _GetMagnitude(EventStr, MagN):
-      if MagN == 1: dI = 0
-      if MagN == 2: dI = 8
-      if MagN == 3: dI = 16
-      M = {}
-      if EventStr:
-        M['MagSize'] = EventStr[55+dI:59+dI].strip(' ')
-        M['MagType'] = EventStr[59+dI].strip(' ')
-        M['MagCode'] = EventStr[60+dI:63+dI].strip(' ')
-        if M['MagType'] == 'L':
-          M['MagType'] = 'ML'
-        if M['MagType'] == 'b':
-          M['MagType'] = 'mb'
-        if M['MagType'] == 'B':
-          M['MagType'] = 'mB'
-        if M['MagType'] == 's':
-          M['MagType'] = 'Ms'
-        if M['MagType'] == 'S':
-          M['MagType'] = 'MS'
-        if M['MagType'] == 'W':
-          M['MagType'] = 'MW'
-        if M['MagType'] == 'G':
-          M['MagType'] = 'MbLg'
-        if M['MagType'] == 'C':
-          M['MagType'] = 'Mc'
-        if M['MagType'] == 'D':
-          M['MagType'] = 'Md'
-
-      return M
-
-    def _GetMagBlock(EventStr):
-      M = []
-      for N in [1,2,3]:
-        M0 = _GetMagnitude(EventStr,N)
-        if M0['MagSize']:
-          M.append(M0)
-      return M
-
-    def _GetLog(EventStr):
-      O = ''
-      if EventStr:
-        S = EventStr[10].strip(' ')
-        if S: O += 'FIXT({0});'.format(S)
-        S = EventStr[20].strip(' ')
-        if S: O += 'LMI({0});'.format(S)
-        S = EventStr[43].strip(' ')
-        if S: O += 'DIND({0});'.format(S)
-        S = EventStr[45:48].strip(' ')
-        if S: O += 'HYPA({0});'.format(S)
-        S = EventStr[48:51].strip(' ')
-        if S: O += 'STAN({0});'.format(S)
-      return O
-
-    # Open SEISAN file
-    with open(file_name, 'r') as f:
-
-      I = 0
-      while True:
-
-        EventStr = f.readline().strip('\n')
-
-        if not EventStr: break
-        if EventStr[79] == '1':
-
-          I += 1
-          L = _GetLocation(EventStr)
-          M = _GetMagBlock(EventStr)
-          O = _GetLog(EventStr)
-
-          self.AddEvent(I, L, M, O)
-
-      f.close()
-      return
-
-    # Warn user if model file does not exist
-    print 'File not found.'
+    if tab.data:
+      for I,D in enumerate(tab.data):
+            if 'Id' in D.keys():
+               I = D['Id']
+            else:
+               I += 1            
+            # Changing the Magcode [Identifier]
+            D['MagCode'] = _GetMagCode(D['MagCode'])
+            L = CU.LocationInit()
+            M = CU.MagnitudeInit()
+      
+            for K in tab.header:
+                if K in L:
+                    L[K] = D[K]
+                if K in M:
+                    M[K] = D[K]
+            if 'Log' in D.keys():
+                O = D['Log']
+            else:
+                O = ''
+            self.AddEvent(I, L, M, O)
