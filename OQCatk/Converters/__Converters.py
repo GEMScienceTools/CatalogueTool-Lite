@@ -65,6 +65,7 @@ def Catk2Hmtk(InputFile, OutputFile):
   tab.RemoveKey('LocCode')
   tab.RemoveKey('MagType')
   tab.RemoveKey('MagCode')
+  tab.RemoveKey('Prime')
   tab.RemoveKey('Log')
 
   tab.Export(OutputFile)

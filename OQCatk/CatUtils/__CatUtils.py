@@ -244,20 +244,18 @@ class Polygon():
 
     else:
       # WKT String
+      XY = XY.split('((')[1]
+      XY = XY.split('))')[0]
+      XY = XY.split('),(')
+
       self.x = []
       self.y = []
 
-      i0 = XY.find('((')+2
-      i1 = XY.find('))')
+      for WktGroup in XY:
+        WktArray = WktGroup.split(',')
 
-      WktData = XY[i0:i1]
-      WktArray = WktData.split('),(')
-
-      for S in WktArray:
-        Array = S.split(',')
-
-        for A in Array:
-          point = A.split(' ')
+        for WktPoint in WktArray[:-1]:
+          point = re.split(' +', WktPoint)
           self.x.append(float(point[0]))
           self.y.append(float(point[1]))
 
