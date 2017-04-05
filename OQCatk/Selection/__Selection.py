@@ -418,6 +418,16 @@ def MergeDuplicate(DbA, DbB=[],
       Db0.Events[I] = []
     Db0.Events = [e for e in Db0.Events if e]
 
+  if LogFile:
+    # Open output ascii file
+    with open(LogFile, 'w') as f:
+      f.write('N1,ID1,N2,ID2,DT,DS\n')
+      for L in LogE:
+        f.write('{0},{1},'.format(L[0],L[1]))
+        f.write('{0},{1},'.format(L[2],L[3]))
+        f.write('{0},{1}\n'.format(L[4],L[5]))
+      f.close()
+
   if Owrite:
     DbA.Events = Db0.Events
     if Log:
@@ -428,18 +438,6 @@ def MergeDuplicate(DbA, DbB=[],
       return Db0, LogE
     else:
       return Db0
-
-  if LogFile:
-    # Open output ascii file
-    with open(LogFile, 'w') as f:
-      for L in LogE:
-        f.write('{0},{1},'.format(L[0],L[1]))
-        f.write('{0},{1},'.format(L[2],L[3]))
-        f.write('{0},{1}\n'.format(L[4],L[5]))
-      f.close()
-      return
-    # Warn user if model file does not exist
-    print 'Warning: Cannot open file'
 
 #-----------------------------------------------------------------------------------------
 
