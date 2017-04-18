@@ -198,7 +198,7 @@ def MfdOptimize(Enum, Mbin, Minc, Mmax, Merr=[], a0=[], b0=[], bfix=[]):
 #-------------------------------------------
 # Plot results
 
-def MfdPlot(a, b, Mmax, Enum=[], Mbin=[], Minc=[], OutFile=[]):
+def MfdPlot(a, b, Mmax, Enum=[], Ecum=[], Mbin=[], Minc=[], OutFile=[]):
 
   # Convert to numpy array
   Enum = np.array(Enum)
@@ -208,14 +208,24 @@ def MfdPlot(a, b, Mmax, Enum=[], Mbin=[], Minc=[], OutFile=[]):
   # Plot
   plt.figure(figsize=(6,4))
 
-  # Observed incremental rates
-  h1 = plt.bar(Mbin, Enum, Minc, edgecolor=[0,0,0],
-                                 color=[0.9,0.9,0.9],
-                                 linewidth=1,
-                                 label='Observed Incremental',
-                                 align='edge',
-                                 log=True,
-                                 zorder=1)
+  # Observed Incremental rates
+  if any(Enum) and any(Mbin) and any(Minc):
+    plt.bar(Mbin, Enum, Minc, edgecolor=[0,0,0],
+                              color=[0.9,0.9,0.9],
+                              linewidth=1,
+                              label='Observed Incremental',
+                              align='edge',
+                              log=True,
+                              zorder=1)
+
+  # Observed Cumulative rates
+  if any(Enum) and any(Mbin):
+    plt.plot(Mbin, Ecum, 'o', color=[1,0,0],
+                              markersize=6,
+                              markeredgecolor=[0,0,0],
+                              linewidth=2,
+                              label='Observed Cumulative',
+                              zorder=4)
 
   # Inverted Incremental rates
   Ninc = MfdInc(a, b, Mbin, Minc, Mmax)

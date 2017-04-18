@@ -64,17 +64,32 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
 
 #-----------------------------------------------------------------------------------------
 
-def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False):
+def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False):
+
+  DbC = Cat.Database()
+  DbC.Header = cp.deepcopy(Db.Header)
+
+  for E in Db.Events:
+    Event = {}
+    Event['Magnitude'] = []
+
+    for M in E['Magnitude']:
+      m = M['MagSize'];
+
+      if m >= MinMag and m < MaxMag:
+        Event['Magnitude'].append(M)
+
+    if Event['Magnitude']:
+      Event['Id'] = E['Id']
+      Event['Log'] = E['Log']
+      Event['Location'] = E['Location']
+      if Any:
+        Event['Magnitude'] = E['Magnitude']
+      DbC.Events.append(cp.deepcopy(Event))
 
   if Owrite:
-    DbC = Db
+    Db.Events = DbC.Events
   else:
-    DbC = Db.Copy()
-
-  DbC.Filter('MagSize',MinMag,Opr='>=')
-  DbC.Filter('MagSize',MaxMag,Opr='<')
-
-  if not Owrite:
     return DbC
 
 #-----------------------------------------------------------------------------------------
@@ -454,6 +469,8 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
   else:
     DbC = Db.Copy()
 
+  Cnt = 0
+
   for E in DbC.Events:
     for A in E['Magnitude']:
 
@@ -470,6 +487,7 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               if not ME: ME = 0
 
               ms,me = ConvFun(MS,ME)
+              Cnt += 1
 
               # Rounding
               if ms != None:
@@ -481,6 +499,8 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               A['MagSize'] = CU.CastValue('MagSize', ms)
               A['MagError'] = CU.CastValue('MagError', me)
               A['MagType'] = CU.CastValue('MagType', MagNew)
+
+  print "Converting {0} to {1}: {2} events found".format(MagOld, MagNew, Cnt)
 
   if not Owrite:
     return DbC

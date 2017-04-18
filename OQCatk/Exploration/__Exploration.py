@@ -50,10 +50,10 @@ def GetMagnitudePair(Db, Code1, Code2):
       MS = M['MagSize']
       ME = M['MagError']
 
-      if MC == Code1[0] and MT == Code1[1]:
+      if (MC == Code1[0] or Code1[0] == '*') and MT == Code1[1]:
         m1 = MS
         e1 = ME
-      if MC == Code2[0] and MT == Code2[1]:
+      if (MC == Code2[0] or Code2[0] == '*') and MT == Code2[1]:
         m2 = MS
         e2 = ME
 
