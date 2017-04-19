@@ -38,11 +38,11 @@ def GardnerKnopoff(M):
 
 def Grunthal(M):
 
-  Swin = np.exp(1.77+(0.037+1.02*M)**2)
+  Swin = np.exp(1.77+np.sqrt(0.037+1.02*M))
   if M >= 6.5:
-    Twin = np.exp(-3.95+(0.62+17.32*M)**2)*84600.
-  else:
     Twin = 10**(2.8+0.024*M)*84600.
+  else:
+    Twin = np.abs(np.exp(-3.95+np.sqrt(0.62+17.32*M)))*84600.
   return Twin, Swin
 
 def Uhrhammer(M):
@@ -53,7 +53,7 @@ def Uhrhammer(M):
 
 #-----------------------------------------------------------------------------------------
 
-def WindowSearch(Db, WinFun=GardnerKnopoff):
+def WindowSearch(Db, WinFun=GardnerKnopoff, WinScale=1):
   """
   """
 
@@ -131,15 +131,17 @@ def WindowSearch(Db, WinFun=GardnerKnopoff):
           E1 = DbM.Events[J]
 
           dT = DeltaSec(T0[I], T0[J])
-          if dT < Tw[I]:
+
+          isAS = (T0[J] > T0[I] and dT <= Tw[I])
+          isFS = (T0[J] < T0[I] and dT <= WinScale*Tw[I])
+
+          if isAS or isFS:
 
             dS = DeltaLen(S0[I], S0[J])
-            if dS < Sw[I]:
+            if dS <= Sw[I]:
 
-              if T0[J] > T0[I]:
-                Log[-1].append(LogInfo('AS', E1, dT, dS))
-              else:
-                Log[-1].append(LogInfo('FS', E1, dT, dS))
+              Flag = 'AS' if isAS else 'FS'
+              Log[-1].append(LogInfo(Flag, E1, dT, dS))
               In[J] = 1
 
   DbM.Events = Events
