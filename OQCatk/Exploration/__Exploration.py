@@ -67,6 +67,27 @@ def GetMagnitudePair(Db, Code1, Code2):
 
 #-----------------------------------------------------------------------------------------
 
+def GetKeyHisto(Db, Key, Bmin=[], Bmax=[], Bnum=10):
+
+  Data = Db.Extract(Key)
+
+  # Remove Nans
+  Data = [D for D in Data if D is not None]
+
+  if not Bmin:
+    Bmin = min(Data)
+  if not Bmax:
+    Bmax = max(Data)
+
+  Bins = np.linspace(Bmin, Bmax, Bnum+1)
+
+  Hist = np.histogram(Data, Bins)[0]
+  Bmid = np.diff(Bins)/2.+Bins[:-1]
+
+  return Hist, Bmid
+
+#-----------------------------------------------------------------------------------------
+
 def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
 
   if Code in ['Magnitude','Mag','M']:

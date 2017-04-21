@@ -306,3 +306,32 @@ class Polygon():
 
     # Warn user if model file does not exist
     print 'File not found.'
+
+  #---------------------------------------------------------------------------------------
+
+  def wgs_to_xy (self):
+    """
+    Approximate conversion using sinusoidal projection.
+    """
+
+    earth_radius = 6371009. # in meters
+    y_dist = np.pi * earth_radius / 180.0
+
+    y = self.y * y_dist
+    x = self.x * y_dist * np.cos(np.radians(self.y))
+
+    # Convert to Km
+    self.y = y/1000.
+    self.x = x/1000.
+
+  #---------------------------------------------------------------------------------------
+
+  def area (self):
+    """
+    Using Shoelace formula to compute area.
+    """
+
+    A = np.dot(self.x, np.roll(self.y, 1))
+    B = np.dot(self.y, np.roll(self.x, 1))
+
+    return 0.5*np.abs(A-B)
