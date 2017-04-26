@@ -309,7 +309,7 @@ class Polygon():
 
   #---------------------------------------------------------------------------------------
 
-  def wgs_to_xy (self):
+  def WgsCart (self):
     """
     Approximate conversion using sinusoidal projection.
     """
@@ -326,7 +326,7 @@ class Polygon():
 
   #---------------------------------------------------------------------------------------
 
-  def area (self):
+  def Area (self):
     """
     Using Shoelace formula to compute area.
     """

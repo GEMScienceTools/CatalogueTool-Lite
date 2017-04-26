@@ -237,6 +237,7 @@ class Database(object):
       NewE[Str0] = []
       Klist = []
 
+      """
       for V in Value:
         for E in Event[Str0]:
           if (Opr == '=') and (E[Key] == V):
@@ -251,6 +252,21 @@ class Database(object):
               NewE[Str0].append(E)
           if (Opr == '<=') and (E[Key] <= V):
               NewE[Str0].append(E)
+      """
+
+      for E in Event[Str0]:
+        if (Opr == '=') and any([V==E[Key] for V in Value]):
+            NewE[Str0].append(E)
+        if (Opr == '!=') and not any([V==E[Key] for V in Value]):
+            NewE[Str0].append(E)
+        if (Opr == '>') and any([V<E[Key] for V in Value]):
+            NewE[Str0].append(E)
+        if (Opr == '<') and any([V>E[Key] for V in Value]):
+            NewE[Str0].append(E)
+        if (Opr == '>=') and any([V<=E[Key] for V in Value]):
+            NewE[Str0].append(E)
+        if (Opr == '<=') and any([V>=E[Key] for V in Value]):
+            NewE[Str0].append(E)
 
       Klist = [k[Key] for k in NewE[Str0]]
 

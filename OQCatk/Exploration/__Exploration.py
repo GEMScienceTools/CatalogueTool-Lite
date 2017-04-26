@@ -67,22 +67,45 @@ def GetMagnitudePair(Db, Code1, Code2):
 
 #-----------------------------------------------------------------------------------------
 
-def GetKeyHisto(Db, Key, Bmin=[], Bmax=[], Bnum=10):
+def GetKeyHisto(Db, Key, Bins=[], Bmin=[], Bmax=[], Bnum=10, Blog=False,
+                         Norm=True, Plot=True, OutFile=[]):
 
   Data = Db.Extract(Key)
 
   # Remove Nans
   Data = [D for D in Data if D is not None]
 
-  if not Bmin:
-    Bmin = min(Data)
-  if not Bmax:
-    Bmax = max(Data)
-
-  Bins = np.linspace(Bmin, Bmax, Bnum+1)
+  if not Bins:
+    if not Bmin:
+      Bmin = min(Data)
+    if not Bmax:
+      Bmax = max(Data)
+    if Blog:
+      Bins = np.logspace(np.log10(Bmin), np.log10(Bmax), Bnum)
+    else:
+      Bins = np.linspace(Bmin, Bmax, Bnum)
 
   Hist = np.histogram(Data, Bins)[0]
   Bmid = np.diff(Bins)/2.+Bins[:-1]
+  Bdlt = np.diff(Bins)
+
+  if Norm:
+   Hist = Hist.astype('float32') / len(Data)
+
+  # Plot time histogram
+  if Plot:
+    fig = plt.figure(figsize=(6,3.5))
+
+    plt.bar(Bmid, Hist, Bdlt, color=[1,0,0], edgecolor=[1,1,1])
+
+    plt.xlabel(Key, fontsize=14, fontweight='bold')
+    plt.ylabel('Nr. Events', fontsize=14, fontweight='bold')
+
+    plt.tight_layout()
+    plt.show(block=False)
+
+    if OutFile:
+      plt.savefig(OutFile, bbox_inches='tight', dpi=150)
 
   return Hist, Bmid
 
