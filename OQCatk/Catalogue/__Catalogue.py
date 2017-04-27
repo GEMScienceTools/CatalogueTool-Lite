@@ -351,16 +351,20 @@ class Database(object):
   def Info(self):
 
     Size = self.Size()
-    Year = self.Extract('Year')
-    Magnitude = self.Extract('MagSize')
-    Latitude = self.Extract('Latitude')
-    Longitude = self.Extract('Longitude')
+
+    def GetBounds(Key):
+      Data = self.Extract(Key, All=True)
+      Data = [D for D in Data if D is not None]
+      Min = min(Data)
+      Max = max(Data)
+      return Min, Max
 
     print 'Number of Events: {0}'.format(Size)
-    print 'Time Rage: ({0}, {1})'.format(min(Year), max(Year))
-    print 'Magntude Rage: ({0}, {1})'.format(min(Magnitude), max(Magnitude))
-    print 'Latitude Rage: ({0}, {1})'.format(min(Latitude), max(Latitude))
-    print 'Longitude Rage: ({0}, {1})'.format(min(Longitude), max(Longitude))
+    print 'Year Rage: ({0[0]},{0[1]})'.format(GetBounds('Year'))
+    print 'Magnitude Rage: ({0[0]},{0[1]})'.format(GetBounds('MagSize'))
+    print 'Latitude Rage: ({0[0]},{0[1]})'.format(GetBounds('Latitude'))
+    print 'Longitude Rage: ({0[0]},{0[1]})'.format(GetBounds('Longitude'))
+    print 'Depth Rage: ({0[0]},{0[1]})'.format(GetBounds('Depth'))
 
   #---------------------------------------------------------------------------------------
 
