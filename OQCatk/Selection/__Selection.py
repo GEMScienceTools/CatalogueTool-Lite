@@ -319,27 +319,31 @@ def SplitPrime(Db):
 def MergeDuplicate(DbA, DbB=[],
                         Twin=60.,
                         Swin=50.,
-                        Unit='Second',
+                        Mwin=[],
+                        Zwin=[],
+                        Tunit='Second',
                         Owrite=True,
                         Log=False,
                         LogFile=[]):
 
-  if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
+  #---------------------------------------------------------------------------------------
+
+  if Tunit not in ['Second','Minute','Hour','Day','Month','Year']:
     print 'Warning: not a valid time'
     return
 
   # Converting current-units to seconds
-  if Unit == 'Second':
+  if Tunit == 'Second':
     Twin *= 1
-  if Unit == 'Minute':
+  if Tunit == 'Minute':
     Twin *= 60
-  if Unit == 'Hour':
+  if Tunit == 'Hour':
     Twin *= 60*60
-  if Unit == 'Day':
+  if Tunit == 'Day':
     Twin *= 60*60*24
-  if Unit == 'Month':
+  if Tunit == 'Month':
     Twin *= 60*60*24*12
-  if Unit == 'Year':
+  if Tunit == 'Year':
     Twin *= 60*60*24*12*365
 
   #---------------------------------------------------------------------------------------
@@ -359,6 +363,16 @@ def MergeDuplicate(DbA, DbB=[],
     Y = Event['Location'][0]['Latitude']
     return [X, Y]
 
+  def GetMag(Event):
+    M = Event['Magnitude'][0]['MagSize']
+    return M
+
+  def GetDep(Event):
+    Z = Event['Location'][0]['Depth']
+    return Z
+
+  #---------------------------------------------------------------------------------------
+
   def DeltaSec(S0, S1):
     Sec = ma.fabs(S1-S0)
     return Sec
@@ -367,34 +381,55 @@ def MergeDuplicate(DbA, DbB=[],
     Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
     return Dis
 
+  def DeltaMag(M0, M1):
+    Mag = ma.fabs(M1-M0)
+    return Mag
+
+  def DeltaDep(Z0, Z1):
+    Dep = ma.fabs(Z1-Z0)
+    return Dep
+
   #---------------------------------------------------------------------------------------
+  # Preallocation
 
   Db0 = DbA.Copy()
   Enum0 = Db0.Size()
   T0 = [0]*Enum0
   S0 = [0]*Enum0
+  M0 = [0]*Enum0
+  Z0 = [0]*Enum0
 
   for I in range(0,Enum0):
     E0 = Db0.Events[I]
     T0[I] = GetDate(E0)
     S0[I] = GetCoor(E0)
+    M0[I] = GetMag(E0)
+    Z0[I] = GetDep(E0)
 
   if DbB:
     Db1 = DbB.Copy()
     Enum1 = Db1.Size()
     T1 = [0]*Enum1
     S1 = [0]*Enum1
+    M1 = [0]*Enum1
+    Z1 = [0]*Enum1
 
     for I in range(0,Enum1):
       E1 = Db1.Events[I]
       T1[I] = GetDate(E1)
       S1[I] = GetCoor(E1)
+      M1[I] = GetMag(E1)
+      Z1[I] = GetDep(E1)
 
   else:
     Db1 = Db0.Copy()
     Enum1 = Enum0
     T1 = T0
     S1 = S0
+    M1 = M0
+    Z1 = Z0
+
+  #---------------------------------------------------------------------------------------
 
   LogE = []
   Ind = []
@@ -404,21 +439,45 @@ def MergeDuplicate(DbA, DbB=[],
     Start = 0 if DbB else I+1
 
     for J in range(Start,Enum1):
+      Tpass = False
+      Spass = False
+      Mpass = False
+      Zpass = False
+
       dT = DeltaSec(T0[I], T1[J])
-
       if (dT <= Twin):
+        Tpass = True
+
         dS = DeltaLen(S0[I], S1[J])
-
         if (dS <= Swin):
-          E0 = Db0.Events[I]
-          E1 = Db1.Events[J]
+          Spass = True
 
-          E0['Location'].extend(E1['Location'])
-          E0['Magnitude'].extend(E1['Magnitude'])
-          E0['Log'] += 'MERGED({0}:{1});'.format(Name, E1['Id'])
+          dM = DeltaMag(M0[I], M1[J])
+          if Mwin:
+            if (dM <= Mwin):
+              Mpass = True
+          else:
+            Mpass = True
 
-          LogE.append((I, E0['Id'], J, E1['Id'], dT, dS))
-          Ind.append(J)
+          dZ = DeltaDep(Z0[I], Z1[J])
+          if Zwin:
+            if (dZ <= Zwin):
+              Zpass = True
+          else:
+            Zpass = True
+
+      if all([Tpass, Spass, Mpass, Zpass]):
+        E0 = Db0.Events[I]
+        E1 = Db1.Events[J]
+
+        E0['Location'].extend(E1['Location'])
+        E0['Magnitude'].extend(E1['Magnitude'])
+        E0['Log'] += 'MERGED({0}:{1});'.format(Name, E1['Id'])
+
+        LogE.append((I, E0['Id'], J, E1['Id'], dT, dS, dM, dZ))
+        Ind.append(J)
+
+  #---------------------------------------------------------------------------------------
 
   if DbB:
     # Append non-duplicate events to catalogue A
@@ -440,7 +499,8 @@ def MergeDuplicate(DbA, DbB=[],
       for L in LogE:
         f.write('{0},{1},'.format(L[0],L[1]))
         f.write('{0},{1},'.format(L[2],L[3]))
-        f.write('{0},{1}\n'.format(L[4],L[5]))
+        f.write('{0},{1},'.format(L[4],L[5]))
+        f.write('{0},{1}\n'.format(L[6],L[7]))
       f.close()
 
   if Owrite:
