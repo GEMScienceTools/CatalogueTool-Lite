@@ -382,11 +382,17 @@ def MergeDuplicate(DbA, DbB=[],
     return Dis
 
   def DeltaMag(M0, M1):
-    Mag = ma.fabs(M1-M0)
+    if not CU.IsEmpty(M0) and not CU.IsEmpty(M1):
+      Mag = ma.fabs(M1-M0)
+    else:
+      Mag = None
     return Mag
 
   def DeltaDep(Z0, Z1):
-    Dep = ma.fabs(Z1-Z0)
+    if not CU.IsEmpty(Z0) and not CU.IsEmpty(Z1):
+      Dep = ma.fabs(Z1-Z0)
+    else:
+      Dep = None
     return Dep
 
   #---------------------------------------------------------------------------------------
