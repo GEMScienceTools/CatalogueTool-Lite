@@ -18,6 +18,7 @@
 #
 # Author: Poggi Valerio
 
+import numpy as np
 import math as ma
 import re
 
@@ -152,19 +153,44 @@ def IsType(value, dtype):
 #-----------------------------------------------------------------------------------------
 
 def WgsDistance(Lat1, Lon1, Lat2, Lon2):
+  """
+  Author: Salvador Dali
+  http://stackoverflow.com/users/1090562/salvador-dali
+  """
 
-    # Author: Salvador Dali
-    # http://stackoverflow.com/users/1090562/salvador-dali
-    p = 0.017453292519943295
+  p = 0.017453292519943295
 
-    c1 = ma.cos((Lat2 - Lat1) * p)
-    c2 = ma.cos(Lat1 * p)
-    c3 = ma.cos(Lat2 * p)
-    c4 = ma.cos((Lon2 - Lon1) * p)
+  c1 = ma.cos((Lat2 - Lat1) * p)
+  c2 = ma.cos(Lat1 * p)
+  c3 = ma.cos(Lat2 * p)
+  c4 = ma.cos((Lon2 - Lon1) * p)
 
-    a = 0.5 - c1/2 + c2 * c3 * (1 - c4) / 2
+  a = 0.5 - c1/2 + c2 * c3 * (1 - c4) / 2
 
-    return 12742 * ma.asin(ma.sqrt(a))
+  return 12742 * ma.asin(ma.sqrt(a))
+
+#-----------------------------------------------------------------------------------------
+
+def WgsToXY (Lat, Lon, Km=True):
+  """
+  Approximate conversion using sinusoidal projection.
+  """
+
+  earth_radius = 6371009. # in meters
+  y_dist = np.pi * earth_radius / 180.0
+
+  Lat = np.array(Lat)
+  Lon = np.array(Lon)
+
+  y = Lat * y_dist
+  x = Lon * y_dist * np.cos(np.radians(Lat))
+
+  # Converting to Km
+  if Km:
+    y /= 1000.
+    x /= 1000.
+
+  return x, y
 
 #-----------------------------------------------------------------------------------------
 
@@ -309,29 +335,23 @@ class Polygon():
 
   #---------------------------------------------------------------------------------------
 
-  def WgsCart (self):
-    """
-    Approximate conversion using sinusoidal projection.
-    """
-
-    earth_radius = 6371009. # in meters
-    y_dist = np.pi * earth_radius / 180.0
-
-    y = self.y * y_dist
-    x = self.x * y_dist * np.cos(np.radians(self.y))
-
-    # Convert to Km
-    self.y = y/1000.
-    self.x = x/1000.
-
-  #---------------------------------------------------------------------------------------
-
-  def Area (self):
+  def Area (self, Wgs=True):
     """
     Using Shoelace formula to compute area.
+    Optionally, Wgs coordinates can be approximated to Km using
+    sinusoidal projection (default).
     """
 
-    A = np.dot(self.x, np.roll(self.y, 1))
-    B = np.dot(self.y, np.roll(self.x, 1))
+    if Wgs:
+      x,y = WgsToXY(self.y, self.x)
+    else:
+      x = np.array(Lon)
+      y = np.array(Lat)
+
+    # Computing area
+    A = np.dot(x, np.roll(y, 1))
+    B = np.dot(y, np.roll(x, 1))
 
     return 0.5*np.abs(A-B)
+
+
