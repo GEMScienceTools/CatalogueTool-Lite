@@ -303,7 +303,7 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   if not Year1:
     Year1 = max(Db.Extract('Year'))
 
-  DbS = Sel.MagRangeSelect(Db, Mag0, Mag1, Owrite=0)
+  DbS = Sel.MagRangeSelect(Db, Mag0, Mag1, Owrite=0, TopEdge=True)
   DbS = Sel.TimeSelect(DbS, Year0, Year1, Owrite=0)
 
   X = DbS.Extract('Year')
@@ -360,7 +360,7 @@ def RateDensityPlot(Db, Mag0=[], Mag1=[], MBin=0.25,
   Histo = np.zeros((np.size(MBins), np.size(YBins)))
 
   # Catalogue selection (Magnitude-Year)
-  DbM = Sel.MagRangeSelect(Db, Mag0, Mag1)
+  DbM = Sel.MagRangeSelect(Db, Mag0, Mag1, TopEdge=True)
   DbY = Sel.TimeSelect(DbM, Year0, Year1)
 
   M = DbY.Extract('MagSize')

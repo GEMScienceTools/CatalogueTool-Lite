@@ -64,7 +64,7 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
 
 #-----------------------------------------------------------------------------------------
 
-def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False):
+def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False, TopEdge=False):
 
   DbC = Cat.Database()
   DbC.Header = cp.deepcopy(Db.Header)
@@ -76,7 +76,13 @@ def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False):
     for M in E['Magnitude']:
       m = M['MagSize'];
 
-      if m >= MinMag and m < MaxMag:
+      Chk1 = (m >= MinMag)
+      if TopEdge:
+        Chk2 = (m <= MaxMag)
+      else:
+        Chk2 = (m < MaxMag)
+
+      if Chk1 and Chk2:
         Event['Magnitude'].append(M)
 
     if Event['Magnitude']:
@@ -94,7 +100,7 @@ def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False):
 
 #-----------------------------------------------------------------------------------------
 
-def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False):
+def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False, TopEdge=False):
 
   if Owrite:
     DbC = Db
@@ -102,7 +108,11 @@ def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False):
     DbC = Db.Copy()
 
   DbC.Filter('Depth',MinDep,Opr='>=')
-  DbC.Filter('Depth',MaxDep,Opr='<')
+
+  if TopEdge:
+    DbC.Filter('Depth',MaxDep,Opr='<=')
+  else:
+    DbC.Filter('Depth',MaxDep,Opr='<')
 
   if not Owrite:
     return DbC

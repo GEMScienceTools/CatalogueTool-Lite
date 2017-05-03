@@ -5,6 +5,7 @@ from __CatUtils import KeyGroup
 from __CatUtils import IsEmpty
 from __CatUtils import IsType
 from __CatUtils import WgsDistance
+from __CatUtils import WgsToXY
 from __CatUtils import LeapCheck
 from __CatUtils import LeapNum
 from __CatUtils import DateToSec
