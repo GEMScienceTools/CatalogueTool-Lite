@@ -26,7 +26,7 @@ import OQCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
-def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
+def AreaSelect(Db, XY, File=[], Owrite=False, Any=False, Buffer=[]):
 
   P = CU.Polygon()
 
@@ -34,6 +34,9 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
     P.Import(XY, Type=File)
   else:
     P.Load(XY)
+
+  if Buffer:
+    P.AddBuffer(Buffer)
 
   DbC = Cat.Database()
   DbC.Header = cp.deepcopy(Db.Header)
@@ -384,26 +387,26 @@ def MergeDuplicate(DbA, DbB=[],
   #---------------------------------------------------------------------------------------
 
   def DeltaSec(S0, S1):
-    Sec = ma.fabs(S1-S0)
-    return Sec
+    DS = ma.fabs(S1-S0)
+    return DS
 
   def DeltaLen(C0, C1):
-    Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
-    return Dis
+    DL = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
+    return DL
 
   def DeltaMag(M0, M1):
     if not CU.IsEmpty(M0) and not CU.IsEmpty(M1):
-      Mag = ma.fabs(M1-M0)
+      DM = ma.fabs(M1-M0)
     else:
-      Mag = None
-    return Mag
+      DM = 0.
+    return DM
 
   def DeltaDep(Z0, Z1):
     if not CU.IsEmpty(Z0) and not CU.IsEmpty(Z1):
-      Dep = ma.fabs(Z1-Z0)
+      DD = ma.fabs(Z1-Z0)
     else:
-      Dep = None
-    return Dep
+      DD = 0.
+    return DD
 
   #---------------------------------------------------------------------------------------
   # Preallocation
@@ -511,7 +514,7 @@ def MergeDuplicate(DbA, DbB=[],
   if LogFile:
     # Open output ascii file
     with open(LogFile, 'w') as f:
-      f.write('N1,ID1,N2,ID2,DT,DS\n')
+      f.write('N1,ID1,N2,ID2,DT,DS,DM,DZ\n')
       for L in LogE:
         f.write('{0},{1},'.format(L[0],L[1]))
         f.write('{0},{1},'.format(L[2],L[3]))

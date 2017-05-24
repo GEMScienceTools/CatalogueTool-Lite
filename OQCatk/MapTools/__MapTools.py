@@ -81,12 +81,12 @@ class GeoMap:
                         self._cfg['Bounds'][1],
                         self._cfg['Bounds'][2],
                         self._cfg['Bounds'][3],
-                        resolution = 'h',
+                        resolution = 'l',
                         projection = 'tmerc',
                         epsg = 3857)
 
     # Background land
-    if self._cfg['Background'][0] == 'none':
+    if self._cfg['Background'][0] == 'color':
       self._map.drawlsmask(land_color = self._cfg['Background'][1],
                            ocean_color = self._cfg['Background'][2],
                            grid = 1.25,
