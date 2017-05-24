@@ -113,7 +113,7 @@ class Database(Cat.Database):
 
   #---------------------------------------------------------------------------------------
 
-  def ImportNdk(self, file_name):
+  def ImportNdk(self, file_name, Tensor=False):
 
     def _GetLocation(HypoStr):
       L = {}
@@ -155,8 +155,21 @@ class Database(Cat.Database):
         M['MagCode'] = 'GCMT-NDK'
       return M
 
+    def _GetMomentTensor(CmtStr):
+      T = {}
+      if CmtStr:
+        T['Mrr'] = float(CmtStr[3:9].strip(' '))
+        T['Mtt'] = float(CmtStr[16:22].strip(' '))
+        T['Mpp'] = float(CmtStr[29:35].strip(' '))
+        T['Mrt'] = float(CmtStr[42:48].strip(' '))
+        T['Mrp'] = float(CmtStr[55:61].strip(' '))
+        T['Mtp'] = float(CmtStr[68:74].strip(' '))
+      return T
+
     # Open NDK file
     with open(file_name, 'r') as f:
+
+      MTS = []
 
       while True:
 
@@ -169,15 +182,21 @@ class Database(Cat.Database):
         L = _GetLocation(HypoStr)
         I = _GetId(Cmt1Str)
         E = _GetExponent(Cmt3Str)
+        T = _GetMomentTensor(Cmt3Str)
         M = _GetMagnitude(Cmt4Str, E)
 
         if I:
           self.AddEvent(I, L, M)
+          MTS.append(T)
         else:
           break
 
       f.close()
-      return
+
+      if Tensor:
+        return MTS
+      else:
+        return
 
     # Warn user if model file does not exist
     print 'File not found.'

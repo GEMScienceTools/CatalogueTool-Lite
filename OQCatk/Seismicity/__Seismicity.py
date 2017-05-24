@@ -260,3 +260,4 @@ def MfdPlot(a, b, Mmax, Enum=[], Ecum=[], Mbin=[], Minc=[], OutFile=[]):
 
   if OutFile:
     plt.savefig(OutFile, bbox_inches='tight', dpi=150)
+

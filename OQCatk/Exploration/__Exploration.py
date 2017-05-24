@@ -309,7 +309,7 @@ def MagTimePlot(Db, Mag0=[], Mag1=[],
   X = DbS.Extract('Year')
   Y = DbS.Extract('MagSize')
 
-  plt.figure(figsize=(8, 4))
+  plt.figure(figsize=(7, 4))
 
   plt.plot(X, Y, 'o',markersize=3,
                   color=[0,0,0],
@@ -376,7 +376,7 @@ def RateDensityPlot(Db, Mag0=[], Mag1=[], MBin=0.25,
         Hist[I] = Hist[I]/Max
 
   # Plot
-  plt.figure(figsize=(8, 4))
+  plt.figure(figsize=(7, 4))
 
   plt.pcolormesh(YBins, MBins, Hist, cmap='Greys', vmin=0)
 

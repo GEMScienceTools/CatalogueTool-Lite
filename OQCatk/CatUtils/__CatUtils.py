@@ -311,6 +311,24 @@ class Polygon():
 
   #---------------------------------------------------------------------------------------
 
+  def AddBuffer(self, Delta):
+    """
+    TO DO:
+    Tempory implementation using Shapely.
+    In the future, all Polygon objects will be defined this way
+    """
+
+    from shapely.geometry import Polygon
+
+    P = Polygon(zip(self.x, self.y))
+    B = P.buffer(Delta)
+
+    x, y = B.exterior.xy
+    self.x = [i for i in x[:-1]]
+    self.y = [i for i in y[:-1]]
+
+  #---------------------------------------------------------------------------------------
+
   def Import (self, FileName, Type='xy'):
 
     with open(FileName, 'r') as f:
@@ -354,4 +372,36 @@ class Polygon():
 
     return 0.5*np.abs(A-B)
 
+  #---------------------------------------------------------------------------------------
 
+  def Grid(self, Dx=0.1, Dy=0.1, Bounds=[]):
+    """
+    Bounds are [MinX, MinY, MaxX, MaxY]
+    """
+
+    if Bounds:
+      MinX = Bounds[0]
+      MinY = Bounds[1]
+      MaxX = Bounds[2]
+      MaxY = Bounds[3]
+    else:
+      MinX = np.min(self.x)
+      MinY = np.min(self.y)
+      MaxX = np.max(self.x)
+      MaxY = np.max(self.y)
+
+    X = np.arange(MinX, MaxX, Dx)
+    Y = np.arange(MinY, MaxY, Dy)
+
+    XY = []
+    for x in X:
+      for y in Y:
+        if self.IsInside(x, y):
+          XY.append([x,y])
+
+    return XY
+
+    """
+    xx, yy = np.meshgrid(X, Y)
+    return zip(xx.flatten(), yy.flatten())
+    """
