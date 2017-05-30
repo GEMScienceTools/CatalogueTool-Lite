@@ -158,6 +158,9 @@ class AsciiTable():
     Method to import data from ascii file (tabular)
     """
 
+    self.header = []
+    self.data = []
+
     # Open input ascii file
     with open(ascii_file, 'r') as f:
 

@@ -34,7 +34,7 @@ def GaussWin (Dis, Sig):
 
 def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
                            Dx=0.1, Dy=0.1, Box=[],
-                           Buffer=[]):
+                           Buffer=[], Grid=[]):
 
   # Catalogue selection
   DbS = Sel.AreaSelect(Db, Wkt, Owrite=0, Buffer=Buffer)
@@ -43,7 +43,11 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
   # Creating the mesh grid
   P = CU.Polygon()
   P.Load(Wkt)
-  XY = P.Grid(Dx=Dx, Dy=Dy, Bounds=Box)
+
+  if Grid:
+    XY = [G for G in Grid if P.IsInside(G[0], G[1]]
+  else:
+    XY = P.Grid(Dx=Dx, Dy=Dy, Bounds=Box)
 
   Win = []
 
