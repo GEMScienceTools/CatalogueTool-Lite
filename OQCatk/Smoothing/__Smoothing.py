@@ -45,7 +45,7 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
   P.Load(Wkt)
 
   if Grid:
-    XY = [G for G in Grid if P.IsInside(G[0], G[1]]
+    XY = [G for G in Grid if P.IsInside(G[0], G[1])]
   else:
     XY = P.Grid(Dx=Dx, Dy=Dy, Bounds=Box)
 
@@ -60,7 +60,7 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
 
   # Scaling and normalising the rates
   Norm = np.sum(Win)
-  a = [a*g/Norm for g in Win]
+  a = [a + np.log10(g/Norm) for g in Win]
 
   x = [i[0] for i in XY]
   y = [i[1] for i in XY]
