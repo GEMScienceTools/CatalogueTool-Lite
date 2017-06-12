@@ -537,8 +537,8 @@ def MergeDuplicate(DbA, DbB=[],
 
 def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
 
-  if type(MagOld) != list:
-    MagOld = [MagOld]
+  if type(MagAgency) != list:
+    MagAgency = [MagAgency]
 
   if type(MagOld) != list:
     MagOld = [MagOld]
@@ -566,7 +566,6 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               if not ME: ME = 0
 
               ms,me = ConvFun(MS,ME)
-              Cnt += 1
 
               # Rounding
               if ms != None:
@@ -574,10 +573,12 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               if me != None:
                 me = float(format(me,'.2f'))
 
-              E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
-              A['MagSize'] = CU.CastValue('MagSize', ms)
-              A['MagError'] = CU.CastValue('MagError', me)
-              A['MagType'] = CU.CastValue('MagType', MagNew)
+              if ms != None:
+                E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
+                A['MagSize'] = CU.CastValue('MagSize', ms)
+                A['MagError'] = CU.CastValue('MagError', me)
+                A['MagType'] = CU.CastValue('MagType', MagNew)
+                Cnt += 1
 
   print "Converting {0} to {1}: {2} events found".format(MagOld, MagNew, Cnt)
 
