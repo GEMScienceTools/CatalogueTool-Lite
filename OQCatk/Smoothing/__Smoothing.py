@@ -33,8 +33,8 @@ def GaussWin (Dis, Sig):
 #-----------------------------------------------------------------------------------------
 
 def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
-                           Dx=0.1, Dy=0.1, Box=[],
-                           Buffer=[], Grid=[]):
+                           Delta=0.1, SphereGrid=False,
+                           Box=[], Buffer=[], Grid=[]):
 
   # Catalogue selection
   DbS = Sel.AreaSelect(Db, Wkt, Owrite=0, Buffer=Buffer)
@@ -47,22 +47,26 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
   if Grid:
     XY = [G for G in Grid if P.IsInside(G[0], G[1])]
   else:
-    XY = P.Grid(Dx=Dx, Dy=Dy, Bounds=Box)
+    if SphereGrid:
+      XY = P.SphereGrid(Delta=Delta)
+    else:
+      XY = P.Grid(Dx=Delta, Dy=Delta, Bounds=Box)
 
   Win = []
-
   for xyP in XY:
     Win.append(0)
-
     for xyE in zip(x,y):
       Dis = CU.WgsDistance(xyP[0], xyP[1], xyE[0], xyE[1])
       Win[-1] += Window(Dis, Par)
 
   # Scaling and normalising the rates
   Norm = np.sum(Win)
-  a = [a + np.log10(g/Norm) for g in Win]
 
-  x = [i[0] for i in XY]
-  y = [i[1] for i in XY]
+  A = []; X = []; Y = []
+  for I,W in enumerate(Win):
+     if Norm > 0. and W > 0.:
+       A.append(a + np.log10(W/Norm))
+       X.append(XY[I][0])
+       Y.append(XY[I][1])
 
-  return x, y, a
+  return X, Y, A

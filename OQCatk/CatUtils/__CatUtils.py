@@ -194,6 +194,43 @@ def WgsToXY (Lat, Lon, Km=True):
 
 #-----------------------------------------------------------------------------------------
 
+def SphericalMesh(Delta, Km=False):
+  """
+  Produce a shperical mesh using golder spiral algorithm.
+  Distance is the average beween nearby points (degree by default).
+  """
+
+  if Km:
+    # Distance is in Km
+    Rad = 6371. # Approximated Earth radius
+    N = np.rint((4*np.pi*Rad**2)/(Delta**2))
+  else:
+    # Distance is in Degree
+    N = (4*np.pi)/(np.deg2rad(Delta)**2)
+
+  I = np.arange(0, N, dtype=float) + 0.5
+
+  Phi = np.arccos(1 - 2*I/N)
+  Theta = np.pi * (1 + 5**0.5) * I
+
+  # Conversion to Lat/Lon
+  Lat = np.rad2deg(Phi) - 90.
+  Lon = np.rad2deg(Unwrap(Theta))
+
+  return Lon, Lat
+
+#-----------------------------------------------------------------------------------------
+
+def Unwrap(Angle):
+  """
+  Unwrap phase angle.
+  Note: Angle must be a numpy array
+  """
+
+  return Angle-(2.*np.pi)*((Angle+np.pi)//(2*np.pi))
+
+#-----------------------------------------------------------------------------------------
+
 def LeapCheck(Year):
 
   C0 = (Year % 4 == 0)
@@ -374,8 +411,10 @@ class Polygon():
 
   #---------------------------------------------------------------------------------------
 
-  def Grid(self, Dx=0.1, Dy=0.1, Bounds=[]):
+  def CartGrid(self, Dx=0.1, Dy=0.1, Bounds=[]):
     """
+    Produce a lat/lon cartesian grid.
+    Dx and Dy distances are degrees (area is not preserved).
     Bounds are [MinX, MinY, MaxX, MaxY]
     """
 
@@ -401,7 +440,28 @@ class Polygon():
 
     return XY
 
+  #---------------------------------------------------------------------------------------
+
+  def SphereGrid(self, Delta=0.5, Bounds=[]):
     """
-    xx, yy = np.meshgrid(X, Y)
-    return zip(xx.flatten(), yy.flatten())
+    Distance between nearby points (in degree) is an approximated value.
+    Bounds are [MinX, MinY, MaxX, MaxY]
     """
+
+    X, Y = SphericalMesh(Delta)
+
+    MinX = np.min(self.x)
+    MinY = np.min(self.y)
+    MaxX = np.max(self.x)
+    MaxY = np.max(self.y)
+
+    XY = []
+    for x, y in zip(X, Y):
+      # Rough selection
+      if x >= MinX and x <= MaxX:
+        if y >= MinY and y <= MaxY:
+          # Refined Selection
+          if self.IsInside(x, y):
+            XY.append([x,y])
+
+    return XY
