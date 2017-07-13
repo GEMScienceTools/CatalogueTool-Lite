@@ -329,6 +329,41 @@ def SplitPrime(Db):
 
 #-----------------------------------------------------------------------------------------
 
+def SelectPrime(Db, Owrite=False):
+  """
+  This method derives from SplitPrime, assuming that:
+  1) Prime is always assigned for multiple solutions
+  2) Event with only one solution is Prime
+  """
+
+  DbP = Cat.Database()
+  DbP.Header = cp.deepcopy(Db.Header)
+
+  for E in Db.Events:
+    if len(E['Location']) > 0:
+
+      Event = {}
+      Event['Id'] = E['Id']
+      Event['Magnitude'] = E['Magnitude']
+      Event['Location'] = [E['Location'][-1]] # Last solution as default
+      Event['Log'] = E['Log']
+
+      # Overwrite with prime solution, if any
+      for L in E['Location']:
+        if L['Prime']:
+          Event['Location'] = [L]
+
+      DbP.Events.append(cp.deepcopy(Event))
+    else:
+      print 'Event {0} has no solution\n'.format(E['Id'])
+
+  if Owrite:
+    Db.Events = DbP.Events
+  else:
+    return DbP
+
+#-----------------------------------------------------------------------------------------
+
 def MergeDuplicate(DbA, DbB=[],
                         Twin=60.,
                         Swin=50.,

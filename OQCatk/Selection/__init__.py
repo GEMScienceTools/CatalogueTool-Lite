@@ -5,5 +5,6 @@ from __Selection import MagCodeSelect
 from __Selection import LocCodeSelect
 from __Selection import TimeSelect
 from __Selection import SplitPrime
+from __Selection import SelectPrime
 from __Selection import MergeDuplicate
 from __Selection import MagConvert
