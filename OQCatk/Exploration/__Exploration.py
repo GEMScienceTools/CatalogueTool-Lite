@@ -181,8 +181,8 @@ def KeyTimeHisto(Db, Code, Key=[],
   ItL, ItD = Db.KeyStat(Code)
 
   # Filter by threshold
-  ItL = [K for K in ItL if ItD[K] > Threshold]
-  ItD = {K:V for (K,V) in ItD.items() if V > Threshold}
+  ItL = [K for K in ItL if ItD[K] >= Threshold]
+  ItD = {K:V for (K,V) in ItD.items() if V >= Threshold}
 
   # Filter by key
   if Key:
