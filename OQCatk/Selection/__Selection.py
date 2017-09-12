@@ -24,9 +24,9 @@ import math as ma
 import OQCatk.Catalogue as Cat
 import OQCatk.CatUtils as CU
 
-#-----------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
+def AreaSelect(Db, XY, File=[], Owrite=False, Any=False, Buffer=[]):
 
   P = CU.Polygon()
 
@@ -34,6 +34,9 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
     P.Import(XY, Type=File)
   else:
     P.Load(XY)
+
+  if Buffer:
+    P.AddBuffer(Buffer)
 
   DbC = Cat.Database()
   DbC.Header = cp.deepcopy(Db.Header)
@@ -64,22 +67,43 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False):
 
 #-----------------------------------------------------------------------------------------
 
-def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False):
+def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False, TopEdge=False):
+
+  DbC = Cat.Database()
+  DbC.Header = cp.deepcopy(Db.Header)
+
+  for E in Db.Events:
+    Event = {}
+    Event['Magnitude'] = []
+
+    for M in E['Magnitude']:
+      m = M['MagSize'];
+
+      Chk1 = (m >= MinMag)
+      if TopEdge:
+        Chk2 = (m <= MaxMag)
+      else:
+        Chk2 = (m < MaxMag)
+
+      if Chk1 and Chk2:
+        Event['Magnitude'].append(M)
+
+    if Event['Magnitude']:
+      Event['Id'] = E['Id']
+      Event['Log'] = E['Log']
+      Event['Location'] = E['Location']
+      if Any:
+        Event['Magnitude'] = E['Magnitude']
+      DbC.Events.append(cp.deepcopy(Event))
 
   if Owrite:
-    DbC = Db
+    Db.Events = DbC.Events
   else:
-    DbC = Db.Copy()
-
-  DbC.Filter('MagSize',MinMag,Opr='>=')
-  DbC.Filter('MagSize',MaxMag,Opr='<')
-
-  if not Owrite:
     return DbC
 
 #-----------------------------------------------------------------------------------------
 
-def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False):
+def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False, TopEdge=False):
 
   if Owrite:
     DbC = Db
@@ -87,7 +111,11 @@ def DepRangeSelect(Db, MinDep, MaxDep, Owrite=False):
     DbC = Db.Copy()
 
   DbC.Filter('Depth',MinDep,Opr='>=')
-  DbC.Filter('Depth',MaxDep,Opr='<')
+
+  if TopEdge:
+    DbC.Filter('Depth',MaxDep,Opr='<=')
+  else:
+    DbC.Filter('Depth',MaxDep,Opr='<')
 
   if not Owrite:
     return DbC
@@ -125,6 +153,7 @@ def MagCodeSelect(Db, MagList, Best=False, Owrite=False):
 
               Event['Magnitude'].append(M)
               if Best:
+                M['MagPrime'] ='True'
                 Stop = True
 
             if Stop: break
@@ -169,6 +198,7 @@ def LocCodeSelect(Db, LocList, Best=False, Owrite=False):
 
           Event['Location'].append(L)
           if Best:
+           L['LocPrime'] ='True'
            Stop = True
 
         if Stop: break
@@ -288,7 +318,7 @@ def SplitPrime(Db):
     Event['Log'] = E['Log']
 
     for L in E['Location']:
-      if L['Prime']:
+      if L['LocPrime']:
         Event['Location'].append(L)
 
     if Event['Location']:
@@ -304,27 +334,31 @@ def SplitPrime(Db):
 def MergeDuplicate(DbA, DbB=[],
                         Twin=60.,
                         Swin=50.,
-                        Unit='Second',
+                        Mwin=[],
+                        Zwin=[],
+                        Tunit='Second',
                         Owrite=True,
                         Log=False,
                         LogFile=[]):
 
-  if Unit not in ['Second','Minute','Hour','Day','Month','Year']:
+  #---------------------------------------------------------------------------------------
+
+  if Tunit not in ['Second','Minute','Hour','Day','Month','Year']:
     print 'Warning: not a valid time'
     return
 
   # Converting current-units to seconds
-  if Unit == 'Second':
+  if Tunit == 'Second':
     Twin *= 1
-  if Unit == 'Minute':
+  if Tunit == 'Minute':
     Twin *= 60
-  if Unit == 'Hour':
+  if Tunit == 'Hour':
     Twin *= 60*60
-  if Unit == 'Day':
+  if Tunit == 'Day':
     Twin *= 60*60*24
-  if Unit == 'Month':
+  if Tunit == 'Month':
     Twin *= 60*60*24*12
-  if Unit == 'Year':
+  if Tunit == 'Year':
     Twin *= 60*60*24*12*365
 
   #---------------------------------------------------------------------------------------
@@ -344,42 +378,79 @@ def MergeDuplicate(DbA, DbB=[],
     Y = Event['Location'][0]['Latitude']
     return [X, Y]
 
-  def DeltaSec(S0, S1):
-    Sec = ma.fabs(S1-S0)
-    return Sec
+  def GetMag(Event):
+    M = Event['Magnitude'][0]['MagSize']
+    return M
 
-  def DeltaLen(C0, C1):
-    Dis = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
-    return Dis
+  def GetDep(Event):
+    Z = Event['Location'][0]['Depth']
+    return Z
 
   #---------------------------------------------------------------------------------------
+
+  def DeltaSec(S0, S1):
+    DS = ma.fabs(S1-S0)
+    return DS
+
+  def DeltaLen(C0, C1):
+    DL = CU.WgsDistance(C0[1],C0[0],C1[1],C1[0])
+    return DL
+
+  def DeltaMag(M0, M1):
+    if not CU.IsEmpty(M0) and not CU.IsEmpty(M1):
+      DM = ma.fabs(M1-M0)
+    else:
+      DM = 0.
+    return DM
+
+  def DeltaDep(Z0, Z1):
+    if not CU.IsEmpty(Z0) and not CU.IsEmpty(Z1):
+      DD = ma.fabs(Z1-Z0)
+    else:
+      DD = 0.
+    return DD
+
+  #---------------------------------------------------------------------------------------
+  # Preallocation
 
   Db0 = DbA.Copy()
   Enum0 = Db0.Size()
   T0 = [0]*Enum0
   S0 = [0]*Enum0
+  M0 = [0]*Enum0
+  Z0 = [0]*Enum0
 
   for I in range(0,Enum0):
     E0 = Db0.Events[I]
     T0[I] = GetDate(E0)
     S0[I] = GetCoor(E0)
+    M0[I] = GetMag(E0)
+    Z0[I] = GetDep(E0)
 
   if DbB:
     Db1 = DbB.Copy()
     Enum1 = Db1.Size()
     T1 = [0]*Enum1
     S1 = [0]*Enum1
+    M1 = [0]*Enum1
+    Z1 = [0]*Enum1
 
     for I in range(0,Enum1):
       E1 = Db1.Events[I]
       T1[I] = GetDate(E1)
       S1[I] = GetCoor(E1)
+      M1[I] = GetMag(E1)
+      Z1[I] = GetDep(E1)
 
   else:
     Db1 = Db0.Copy()
     Enum1 = Enum0
     T1 = T0
     S1 = S0
+    M1 = M0
+    Z1 = Z0
+
+  #---------------------------------------------------------------------------------------
 
   LogE = []
   Ind = []
@@ -389,21 +460,45 @@ def MergeDuplicate(DbA, DbB=[],
     Start = 0 if DbB else I+1
 
     for J in range(Start,Enum1):
+      Tpass = False
+      Spass = False
+      Mpass = False
+      Zpass = False
+
       dT = DeltaSec(T0[I], T1[J])
-
       if (dT <= Twin):
+        Tpass = True
+
         dS = DeltaLen(S0[I], S1[J])
-
         if (dS <= Swin):
-          E0 = Db0.Events[I]
-          E1 = Db1.Events[J]
+          Spass = True
 
-          E0['Location'].extend(E1['Location'])
-          E0['Magnitude'].extend(E1['Magnitude'])
-          E0['Log'] += 'MERGED({0}:{1});'.format(Name, E1['Id'])
+          dM = DeltaMag(M0[I], M1[J])
+          if Mwin:
+            if (dM <= Mwin):
+              Mpass = True
+          else:
+            Mpass = True
 
-          LogE.append((I, E0['Id'], J, E1['Id'], dT, dS))
-          Ind.append(J)
+          dZ = DeltaDep(Z0[I], Z1[J])
+          if Zwin:
+            if (dZ <= Zwin):
+              Zpass = True
+          else:
+            Zpass = True
+
+      if all([Tpass, Spass, Mpass, Zpass]):
+        E0 = Db0.Events[I]
+        E1 = Db1.Events[J]
+
+        E0['Location'].extend(E1['Location'])
+        E0['Magnitude'].extend(E1['Magnitude'])
+        E0['Log'] += 'MERGED({0}:{1});'.format(Name, E1['Id'])
+
+        LogE.append((I, E0['Id'], J, E1['Id'], dT, dS, dM, dZ))
+        Ind.append(J)
+
+  #---------------------------------------------------------------------------------------
 
   if DbB:
     # Append non-duplicate events to catalogue A
@@ -418,6 +513,17 @@ def MergeDuplicate(DbA, DbB=[],
       Db0.Events[I] = []
     Db0.Events = [e for e in Db0.Events if e]
 
+  if LogFile:
+    # Open output ascii file
+    with open(LogFile, 'w') as f:
+      f.write('N1,ID1,N2,ID2,DT,DS,DM,DZ\n')
+      for L in LogE:
+        f.write('{0},{1},'.format(L[0],L[1]))
+        f.write('{0},{1},'.format(L[2],L[3]))
+        f.write('{0},{1},'.format(L[4],L[5]))
+        f.write('{0},{1}\n'.format(L[6],L[7]))
+      f.close()
+
   if Owrite:
     DbA.Events = Db0.Events
     if Log:
@@ -429,24 +535,13 @@ def MergeDuplicate(DbA, DbB=[],
     else:
       return Db0
 
-  if LogFile:
-    # Open output ascii file
-    with open(LogFile, 'w') as f:
-      for L in LogE:
-        f.write('{0},{1},'.format(L[0],L[1]))
-        f.write('{0},{1},'.format(L[2],L[3]))
-        f.write('{0},{1}\n'.format(L[4],L[5]))
-      f.close()
-      return
-    # Warn user if model file does not exist
-    print 'Warning: Cannot open file'
-
-#-----------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
 
-  if type(MagOld) != list:
-    MagOld = [MagOld]
+
+  if type(MagAgency) != list:
+    MagAgency = [MagAgency]
 
   if type(MagOld) != list:
     MagOld = [MagOld]
@@ -455,6 +550,9 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
     DbC = Db
   else:
     DbC = Db.Copy()
+
+  Cnt = 0
+  Cntn = 0
 
   for E in DbC.Events:
     for A in E['Magnitude']:
@@ -471,18 +569,26 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               if not MS: MS = None
               if not ME: ME = 0
 
-              ms,me = ConvFun(MS,ME)
+              ms,me,mo,eo = ConvFun(MS,ME)
 
               # Rounding
               if ms != None:
                 ms = float(format(ms,'.2f'))
               if me != None:
                 me = float(format(me,'.2f'))
+              if ms != None:
+                E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
+                A['MagSize'] = CU.CastValue('MagSize', ms)
+                A['MagError'] = CU.CastValue('MagError', me)
+                A['MagType'] = CU.CastValue('MagType', MagNew)
+                Cnt += 1
+              else:
+                A['MagSize'] = CU.CastValue('MagSize', mo)
+                A['MagError'] = CU.CastValue('MagError', eo)
+                Cntn += 1
 
-              E['Log'] += 'MAGCONV({0}:{1});'.format(A['MagCode'],A['MagType'])
-              A['MagSize'] = CU.CastValue('MagSize', ms)
-              A['MagError'] = CU.CastValue('MagError', me)
-              A['MagType'] = CU.CastValue('MagType', MagNew)
+  print "Converting {0} to {1}: {2} events found".format(MagOld, MagNew, Cnt)
+  print "No Converted {0} to {1}: {2} events found".format(MagOld, MagNew, Cntn)
 
   if not Owrite:
     return DbC
