@@ -34,7 +34,8 @@ def GaussWin (Dis, Sig):
 
 def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
                            Delta=0.1, SphereGrid=False,
-                           Box=[], Buffer=[], Grid=[]):
+                           Box=[], Buffer=[], Grid=[],
+                           Threshold=-100):
 
   # Catalogue selection
   DbS = Sel.AreaSelect(Db, Wkt, Owrite=0, Buffer=Buffer)
@@ -65,8 +66,11 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
   A = []; X = []; Y = []
   for I,W in enumerate(Win):
      if Norm > 0. and W > 0.:
-       A.append(a + np.log10(W/Norm))
-       X.append(XY[I][0])
-       Y.append(XY[I][1])
+       aT = a + np.log10(W/Norm)
+       # Numerical threshold for a-value
+       if aT >= Threshold:
+         A.append(aT)
+         X.append(XY[I][0])
+         Y.append(XY[I][1])
 
   return X, Y, A
