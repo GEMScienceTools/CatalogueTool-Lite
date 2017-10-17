@@ -18,6 +18,7 @@
 #
 # Author: Poggi Valerio
 
+import shapely as shp
 import numpy as np
 import math as ma
 import re
@@ -283,6 +284,50 @@ def DateToSec(Year, Month, Day, Hour, Minute, Second):
 
 #-----------------------------------------------------------------------------------------
 
+def WktToXY(WktString):
+  """
+  NOTE:
+  1) Internal polygons are not considered
+  2) Multi objects are simply concatenated
+  """
+
+  from array import array
+
+  def multicoords(WktObj):
+    """
+    Subfunction to iterate though multi objects
+    """
+    X = array('d', [])
+    Y = array('d', [])
+    for M in WktObj:
+      try:
+        x,y = M.coords.xy
+      except:
+        x,y = M.exterior.coords.xy
+      X += x
+      Y += y
+    return X, Y
+
+  # Loading WKT
+  WktObj = shp.wkt.loads(WktString)
+
+  if WktObj.type in ['Point', 'LineString', 'Polygon']:
+    try:
+      X,Y = WktObj.coords.xy
+    except:
+      X,Y = WktObj.exterior.coords.xy
+
+  if WktObj.type in ['MultiPoint', 'MultiLineString', 'MultiPolygon']:
+    X,Y = multicoords(WktObj)
+
+  # Conversion to list
+  X = [x for x in X]
+  Y = [y for y in Y]
+
+  return X, Y
+
+#-----------------------------------------------------------------------------------------
+
 class Polygon():
 
   def __init__(self):
@@ -302,25 +347,16 @@ class Polygon():
     """
 
     if type(XY) == list:
+      # List of coordinate pairs
       self.x = [N[0] for N in XY]
       self.y = [N[1] for N in XY]
 
-    else:
+    elif type(XY) == str:
       # WKT String
-      XY = XY.split('((')[1]
-      XY = XY.split('))')[0]
-      XY = XY.split('),(')
+      self.x, self.y = WktToXY(XY)
 
-      self.x = []
-      self.y = []
-
-      for WktGroup in XY:
-        WktArray = WktGroup.split(',')
-
-        for WktPoint in WktArray[:-1]:
-          point = re.split(' +', WktPoint)
-          self.x.append(float(point[0]))
-          self.y.append(float(point[1]))
+    else:
+      print 'Format not recognized'
 
   #---------------------------------------------------------------------------------------
 
@@ -355,9 +391,7 @@ class Polygon():
     In the future, all Polygon objects will be defined this way
     """
 
-    from shapely.geometry import Polygon
-
-    P = Polygon(zip(self.x, self.y))
+    P = shp.geometry.Polygon(zip(self.x, self.y))
     B = P.buffer(Delta)
 
     x, y = B.exterior.xy
@@ -465,3 +499,77 @@ class Polygon():
             XY.append([x,y])
 
     return XY
+
+#-----------------------------------------------------------------------------------------
+
+class Trace():
+
+  def __init__(self):
+
+    self.x = []
+    self.y = []
+
+  #---------------------------------------------------------------------------------------
+
+  def Load(self, XY):
+    """
+    Input trace line can be defined in two possible ways:
+    1) list of x-y float pairs, e.g.
+        [[22.0, -15.0],[24.0, -15.0],[24.0, -10.0],[22.0, -15.0]]
+    2) wkt formatted string, e.g.
+        'LINESTRING((22. -15.,24. -15.,24. -10.,22. -15.))'
+    """
+
+    if type(XY) == list:
+      # List of coordinate pairs
+      self.x = [N[0] for N in XY]
+      self.y = [N[1] for N in XY]
+
+    elif type(XY) == str:
+      # WKT String
+      self.x, self.y = WktToXY(XY)
+
+    else:
+      print 'Format not recognized'
+
+  #---------------------------------------------------------------------------------------
+
+  def Buffer(self, Delta):
+    """
+    Return a polygon object containing the buffer area
+    """
+
+    L = shp.geometry.LineString(zip(self.x, self.y))
+    B = L.buffer(Delta)
+
+    P = Polygon()
+    x, y = B.exterior.xy
+
+    P.x = [i for i in x[:-1]]
+    P.y = [i for i in y[:-1]]
+
+    return P
+
+  #---------------------------------------------------------------------------------------
+
+  def Resample(self, Delta):
+    """
+    Original code by Christian K (modified)
+    https://stackoverflow.com/users/2588210/christian-k
+    """
+
+    x = np.array(self.x)
+    y = np.array(self.y)
+
+    xd = np.diff(x)
+    yd = np.diff(y)
+
+    dist = np.sqrt(xd**2+yd**2)
+
+    u = np.cumsum(dist)
+    u = np.hstack([[0],u])
+
+    t = np.linspace(0,u.max(), int(u.max()//Delta))
+
+    self.x = np.interp(t, u, x)
+    self.y = np.interp(t, u, y)
