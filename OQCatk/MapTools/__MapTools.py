@@ -223,7 +223,6 @@ class GeoMap:
     if not Clim:
       Clim = [z.min(), z.max()]
 
-    z = z[:-1, :-1]
     levels = MaxNLocator(nbins=16).tick_values(Clim[0], Clim[1])
     norm = BoundaryNorm(levels, ncolors = Cmap.N, clip=True)
 
@@ -241,6 +240,7 @@ class GeoMap:
 
     else:
       self._zo += 1
+      z = z[:-1, :-1]
       h = plt.pcolormesh(x, y, z, cmap = Cmap,
                                   norm = norm,
                                   vmin = Clim[0],
@@ -250,8 +250,9 @@ class GeoMap:
                                   zorder = self._zo)
 
     clb = plt.gcf().colorbar(h, orientation = 'vertical')
-    clb.outline.set_linewidth(2)
-    clb.set_label('Spectral Acceleration ($g$)')
+    clb.outline.set_linewidth(1)
+    clb.ax.tick_params(labelsize=14)
+    clb.set_label('Spectral Acceleration ($g$)', size=12)
 
   #---------------------------------------------------------------------------------------
 
