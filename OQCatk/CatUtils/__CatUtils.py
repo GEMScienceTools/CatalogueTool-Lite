@@ -19,6 +19,7 @@
 # Author: Poggi Valerio
 
 import shapely as shp
+import scipy as scp
 import numpy as np
 import math as ma
 import re
@@ -192,6 +193,19 @@ def WgsToXY (Lat, Lon, Km=True):
     x /= 1000.
 
   return x, y
+
+#-----------------------------------------------------------------------------------------
+
+def ConcaveHull (X, Y):
+  """
+  """
+
+  points = zip(X, Y)
+  hull = scp.spatial.ConvexHull(points)
+  ChX = points[hull.vertices,0]
+  ChY = points[hull.vertices,1]
+
+  return ChX, ChY
 
 #-----------------------------------------------------------------------------------------
 
