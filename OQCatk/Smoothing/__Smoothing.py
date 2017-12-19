@@ -37,6 +37,9 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
                            Box=[], Buffer=[], Grid=[],
                            Threshold=-100):
 
+  if Par <= 0:
+    Par = np.inf
+
   # Catalogue selection
   DbS = Sel.AreaSelect(Db, Wkt, Owrite=0, Buffer=Buffer)
   x,y,z = Exp.GetHypocenter(DbS)
@@ -57,7 +60,7 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
   for xyP in XY:
     Win.append(0)
     for xyE in zip(x,y):
-      Dis = CU.WgsDistance(xyP[0], xyP[1], xyE[0], xyE[1])
+      Dis = CU.WgsDistance(xyP[1], xyP[0], xyE[1], xyE[0])
       Win[-1] += Window(Dis, Par)
 
   # Scaling and normalising the rates
