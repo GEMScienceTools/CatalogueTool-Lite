@@ -498,3 +498,12 @@ class Database(object):
     for I, E in enumerate(self.Events):
       E['Log'] += 'PREID({0});'.format(E['Id'])
       E['Id'] = Str0+str(I).zfill(LZ)+Str1
+
+  #---------------------------------------------------------------------------------------
+
+  def UnWrap(self):
+
+    for E in self.Events:
+      for L in E['Location']:
+        if L['Longitude'] < 0.:
+          L['Longitude'] += 360.
