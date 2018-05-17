@@ -210,7 +210,7 @@ def MfdPlot(a, b, Mmax, Enum=[], Ecum=[], Mbin=[], Minc=[], OutFile=[]):
 
   # Observed Incremental rates
   if any(Enum) and any(Mbin) and any(Minc):
-    plt.bar(Mbin, Enum, Minc, edgecolor=[0,0,0],
+    plt.bar(Mbin, Enum, Minc, edgecolor=[[0,0,0] for i in range(0,len(Mbin))],
                               color=[0.9,0.9,0.9],
                               linewidth=1,
                               label='Observed Incremental',

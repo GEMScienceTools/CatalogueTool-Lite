@@ -113,7 +113,7 @@ class Database(Cat.Database):
 
   #---------------------------------------------------------------------------------------
 
-  def ImportNdk(self, file_name, Tensor=False):
+  def ImportNdk(self, file_name):
 
     def _GetLocation(HypoStr):
       L = {}
@@ -169,7 +169,7 @@ class Database(Cat.Database):
     # Open NDK file
     with open(file_name, 'r') as f:
 
-      MTS = []
+      self.Tensor = []
 
       while True:
 
@@ -187,16 +187,12 @@ class Database(Cat.Database):
 
         if I:
           self.AddEvent(I, L, M)
-          MTS.append(T)
+          self.Tensor.append(T)
         else:
           break
 
       f.close()
-
-      if Tensor:
-        return MTS
-      else:
-        return
+      return
 
     # Warn user if model file does not exist
     print 'File not found.'

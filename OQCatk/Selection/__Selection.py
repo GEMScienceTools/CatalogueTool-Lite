@@ -26,7 +26,7 @@ import OQCatk.CatUtils as CU
 
 #-----------------------------------------------------------------------------------------
 
-def AreaSelect(Db, XY, File=[], Owrite=False, Any=False, Buffer=[]):
+def AreaSelect(Db, XY, File=[], Owrite=False, Any=False, Buffer=[], Unwrap=False):
 
   P = CU.Polygon()
 
@@ -34,6 +34,9 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False, Buffer=[]):
     P.Import(XY, Type=File)
   else:
     P.Load(XY)
+
+  if Unwrap:
+    P.Unwrap()
 
   if Buffer:
     P.AddBuffer(Buffer)
@@ -48,6 +51,9 @@ def AreaSelect(Db, XY, File=[], Owrite=False, Any=False, Buffer=[]):
     for L in E['Location']:
       x = L['Longitude'];
       y = L['Latitude']
+
+      if Unwrap:
+        x = x if x >= 0. else x+360.
 
       if P.IsInside(x,y):
         Event['Location'].append(L)

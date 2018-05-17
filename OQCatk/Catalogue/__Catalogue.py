@@ -325,6 +325,31 @@ class Database(object):
 
   #---------------------------------------------------------------------------------------
 
+  def Select(self, Index, Boolean=False, Owrite=True):
+    """
+    Catalogue selection by index.
+    Index can be scalar or boolean (optional)
+    """
+
+    if not isinstance(Index, list):
+      Index = [Index]
+
+    if Boolean:
+      Index = [i for i,b in enumerate(Index) if b]
+
+    Out = Database()
+    Out.Header = cp.deepcopy(self.Header)
+
+    for I in Index:
+      Out.Events.append(cp.deepcopy(self.Events[I]))
+
+    if Owrite:
+      self.Events = Out.Events
+    else:
+      return Out
+
+  #---------------------------------------------------------------------------------------
+
   def KeyStat(self, Key, Verbose=False):
 
     ItemList = []
@@ -498,3 +523,12 @@ class Database(object):
     for I, E in enumerate(self.Events):
       E['Log'] += 'PREID({0});'.format(E['Id'])
       E['Id'] = Str0+str(I).zfill(LZ)+Str1
+
+  #---------------------------------------------------------------------------------------
+
+  def UnWrap(self):
+
+    for E in self.Events:
+      for L in E['Location']:
+        if L['Longitude'] < 0.:
+          L['Longitude'] += 360.
