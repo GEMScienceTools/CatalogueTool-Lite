@@ -12,5 +12,6 @@ from __CatUtils import LeapCheck
 from __CatUtils import LeapNum
 from __CatUtils import DateToSec
 from __CatUtils import WktToXY
+from __CatUtils import XYToWkt
 from __CatUtils import Polygon
 from __CatUtils import Trace

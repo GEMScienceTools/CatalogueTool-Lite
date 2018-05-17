@@ -340,6 +340,22 @@ def WktToXY(WktString):
 
   return X, Y
 
+#---------------------------------------------------------------------------------------
+
+def XYToWkt(X, Y):
+  """
+  """
+  WktString = 'POLYGON (('
+
+  Data = []
+  for x, y in zip(X, Y):
+    Data.append('{0} {1}'.format(x,y))
+
+  WktString += ','.join(Data)
+  WktString += '))'
+
+  return WktString
+
 #-----------------------------------------------------------------------------------------
 
 class Polygon():
@@ -371,6 +387,16 @@ class Polygon():
 
     else:
       print 'Format not recognized'
+
+  #---------------------------------------------------------------------------------------
+
+  def Unwrap(self, Dir='Plus'):
+    """
+    """
+    if Dir == 'Plus':
+      self.x = [x if x > 0. else x+360. for x in self.x]
+    else:
+      self.x = [x if x < 0. else x-360. for x in self.x]
 
   #---------------------------------------------------------------------------------------
 
@@ -490,7 +516,7 @@ class Polygon():
 
   #---------------------------------------------------------------------------------------
 
-  def SphereGrid(self, Delta=0.5, Bounds=[]):
+  def SphereGrid(self, Delta=0.5, Bounds=[], Unwrap=False):
     """
     Distance between nearby points (in degree) is an approximated value.
     Bounds are [MinX, MinY, MaxX, MaxY]
@@ -498,10 +524,19 @@ class Polygon():
 
     X, Y = SphericalMesh(Delta)
 
-    MinX = np.min(self.x)
-    MinY = np.min(self.y)
-    MaxX = np.max(self.x)
-    MaxY = np.max(self.y)
+    if Unwrap:
+      X = [x+360. if x < 0. else x for x in X]
+
+    if Bounds:
+      MinX = Bounds[0]
+      MinY = Bounds[1]
+      MaxX = Bounds[2]
+      MaxY = Bounds[3]
+    else:
+      MinX = np.min(self.x)
+      MinY = np.min(self.y)
+      MaxX = np.max(self.x)
+      MaxY = np.max(self.y)
 
     XY = []
     for x, y in zip(X, Y):
