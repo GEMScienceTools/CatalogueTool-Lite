@@ -20,14 +20,30 @@
 
 import math as mt
 
+import OQCatk.Regressor as Reg
+
 #-----------------------------------------------------------------------------------------
-# Generic (template)
+# Generic 1:1
 
 def Mw_Mw_Generic(MagSize, MagError):
   """
+  Generic 1:1 conversion
   """
 
   return (MagSize, MagError)
+
+#-----------------------------------------------------------------------------------------
+# Generic from coefficients (polynomial)
+
+def Mw_PolyReg(MagSize, MagError, Coeff):
+  """
+  Conversion using polynomial coefficients
+  """
+
+  M = Reg.PolyFun(Coeff, MagSize)
+  E = None # Still to implement
+
+  return (M, E)
 
 #-----------------------------------------------------------------------------------------
 # Scordilis (2006)

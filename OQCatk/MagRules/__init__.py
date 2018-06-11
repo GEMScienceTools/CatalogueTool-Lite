@@ -1,4 +1,5 @@
 from __MagRules import Mw_Mw_Generic
+from __MagRules import Mw_PolyReg
 from __MagRules import Ms_Mw_Scordilis2006
 from __MagRules import mb_Mw_Scordilis2006
 from __MagRules import Ms_Mw_Lin_DiGiacomo2015
