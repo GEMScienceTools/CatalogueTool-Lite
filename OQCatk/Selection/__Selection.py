@@ -576,7 +576,7 @@ def MergeDuplicate(DbA, DbB=[],
 
 #-----------------------------------------------------------------------------------------
 
-def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
+def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Coeff=None, Owrite=True):
 
   if type(MagAgency) != list:
     MagAgency = [MagAgency]
@@ -606,7 +606,10 @@ def MagConvert(Db, MagAgency, MagOld, MagNew, ConvFun, Owrite=True):
               if not MS: MS = None
               if not ME: ME = 0
 
-              ms,me = ConvFun(MS,ME)
+              if Coeff:
+                ms,me = ConvFun(MS, ME, Coeff)
+              else:
+                ms,me = ConvFun(MS, ME)
 
               # Rounding
               if ms != None:

@@ -136,3 +136,14 @@ class Data(object):
   def Close(self):
 
     plt.close('all')
+
+  #-----------------------------------------------------------------------------------------
+
+  def Print(self):
+    """
+    Print regression coefficients.
+    """
+
+    print('Coefficients: ['),
+    print(', '.join([str(b) for b in self.B])),
+    print(']\n')
