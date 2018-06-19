@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2010-2017 GEM Foundation
@@ -28,7 +27,10 @@ import OQCatk.CatUtils as CU
 
 def GaussWin (Dis, Sig):
 
-  return np.exp(-(Dis**2)/(Sig**2.))
+  # Old legacy version
+  # return np.exp(-(Dis/Sig)**2.)
+
+  return np.exp(-0.5*(Dis/Sig)**2.)
 
 #-----------------------------------------------------------------------------------------
 
@@ -68,6 +70,10 @@ def SmoothMFD (Db, a, Wkt, Window=GaussWin, Par=50.,
     for xyE in zip(x,y):
       Dis = CU.WgsDistance(xyP[1], xyP[0], xyE[1], xyE[0])
       Win[-1] += Window(Dis, Par)
+
+  # Using homogenous zone if no events are found
+  #if all(i == 0 for i in Win):
+  #  Win = [1. for i in Win]
 
   # Scaling and normalising the rates
   Norm = np.sum(Win)
