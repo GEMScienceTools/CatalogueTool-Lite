@@ -212,7 +212,7 @@ class AsciiTable():
       return
 
     # Warn user if model file does not exist
-    print 'File not found.'
+    print('File not found.')
 
   #---------------------------------------------------------------------------------------
 
@@ -245,7 +245,7 @@ class AsciiTable():
 
     except:
       # Warn user if model file does not exist
-      print 'Cannot open file.'
+      print('Cannot open file.')
 
   #---------------------------------------------------------------------------------------
 
@@ -260,7 +260,7 @@ class AsciiTable():
         self.data.append(new_table.data[i])
 
     else:
-      print 'Error: headers do not match...'
+      print('Error: headers do not match...')
 
   #---------------------------------------------------------------------------------------
 

@@ -109,7 +109,7 @@ class Database(Cat.Database):
       return
 
     # Warn user if model file does not exist
-    print 'File not found.'
+    print('File not found.')
 
   #---------------------------------------------------------------------------------------
 
@@ -195,7 +195,7 @@ class Database(Cat.Database):
       return
 
     # Warn user if model file does not exist
-    print 'File not found.'
+    print('File not found.')
 
   #---------------------------------------------------------------------------------------
 
@@ -282,7 +282,7 @@ class Database(Cat.Database):
       return
 
     # Warn user if model file does not exist
-    print 'File not found.'
+    print('File not found.')
 
   #---------------------------------------------------------------------------------------
 

@@ -25,7 +25,7 @@ Version 20/10/2016
 
 import os
 import time
-import urllib2
+from urllib.request import urlopen
 import collections
 
 #-----------------------------------------------------------------------------------------
@@ -94,13 +94,13 @@ class ISCBulletinUrl():
 
   def ListFields(self):
 
-    print "\nCURRENT SETTINGS:\n"
+    print("\nCURRENT SETTINGS:\n")
 
     for Key in self.Request:
 
       Value = self.Request[Key].split("=")[1]
       if not Value: Value = "[Empty]"
-      print "\t" + Key + " = " + Value
+      print("\t" + Key + " = " + Value)
 
   #---------------------------------------------------------------------------------------
 
@@ -179,18 +179,17 @@ class ISCBulletinUrl():
 
     while True:
 
-      UrlReq = urllib2.Request(UrlString)
-      UrlRes = urllib2.urlopen(UrlReq)
+      UrlRes = urlopen(UrlString)
       Page = UrlRes.read()
       UrlRes.close()
 
       if Page.find("Sorry") > -1:
 
         if Tries > 10:
-          print "Warning: Maximum number of attempts reached..."
+          print("Warning: Maximum number of attempts reached...")
           break
 
-        print "Warning: Server is busy, retrying in a few seconds..."
+        print("Warning: Server is busy, retrying in a few seconds...")
         time.sleep(30)
         Tries += 1
 
@@ -206,7 +205,7 @@ class ISCBulletinUrl():
 
         else:
 
-          print "Warning: Cataloge not available for the selected period."
+          print("Warning: Cataloge not available for the selected period.")
           break
 
     return CatBlock
@@ -242,7 +241,7 @@ class ISCBulletinUrl():
         self.SetField("StartYear",SY)
         self.SetField("EndYear",EY)
 
-        print "Downloading block:",SY,"-",EY
+        print("Downloading block:",SY,"-",EY)
         Chunk = self.DownloadBlock()
 
         if SY != StartYear:
@@ -256,7 +255,7 @@ class ISCBulletinUrl():
   def WriteOutput(self, OutputFile, OverWrite=False):
 
     if os.path.isfile(OutputFile) and not OverWrite:
-      print "Warning: File exists. Use OverWrite option."
+      print("Warning: File exists. Use OverWrite option.")
       return
 
     try:
@@ -264,5 +263,5 @@ class ISCBulletinUrl():
         CatFile.write("%s" % self.CatBlock)
         CatFile.close()
     except:
-      print "Warning: Cannot open output file...."
+      print("Warning: Cannot open output file....")
 
