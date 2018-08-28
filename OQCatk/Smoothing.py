@@ -28,7 +28,7 @@ import OQCatk.CatUtils as CU
 def GaussWin (Dis, Sig):
 
   # Old legacy version
-  # return np.exp(-(Dis/Sig)**2.)
+  #return np.exp(-(Dis/Sig)**2.)
 
   return np.exp(-0.5*(Dis/Sig)**2.)
 

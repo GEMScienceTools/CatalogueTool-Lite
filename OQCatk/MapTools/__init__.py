@@ -1,1 +1,0 @@
-from __MapTools import GeoMap

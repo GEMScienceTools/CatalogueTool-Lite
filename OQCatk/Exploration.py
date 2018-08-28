@@ -118,7 +118,7 @@ def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
   elif Code in ['Location','Loc','L']:
     ItL, ItD = Db.KeyStat('LocCode')
   else:
-    print 'Error: No valid code'
+    print('Error: No valid code')
     return
 
   # Report only specific keys
@@ -161,10 +161,10 @@ def AgencyReport(Db, Code, Key=[], LogFile=[], Threshold=0):
       f.close()
       return
     # Warn user if model file does not exist
-    print 'Cannot open file'
+    print('Cannot open file')
 
   else:
-    print StrLog
+    print(StrLog)
 
 #-----------------------------------------------------------------------------------------
 

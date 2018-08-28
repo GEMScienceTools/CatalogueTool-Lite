@@ -267,7 +267,7 @@ def LeapNum(Year):
 def DateToSec(Year, Month, Day, Hour, Minute, Second):
 
   if Year < 1:
-    print 'Warning: Year must be > 1'
+    print('Warning: Year must be > 1')
     return None
 
   if not Year: Year = 1.
@@ -386,7 +386,7 @@ class Polygon():
       self.x, self.y = WktToXY(XY)
 
     else:
-      print 'Format not recognized'
+      print('Format not recognized')
 
   #---------------------------------------------------------------------------------------
 
@@ -460,7 +460,7 @@ class Polygon():
       return
 
     # Warn user if model file does not exist
-    print 'File not found.'
+    print('File not found.')
 
   #---------------------------------------------------------------------------------------
 
@@ -579,7 +579,7 @@ class Trace():
       self.x, self.y = WktToXY(XY)
 
     else:
-      print 'Format not recognized'
+      print('Format not recognized')
 
   #---------------------------------------------------------------------------------------
 

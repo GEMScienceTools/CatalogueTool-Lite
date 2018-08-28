@@ -22,11 +22,11 @@
 
 def Print(Key):
   if Key in Code.keys():
-    print 'CODE: {0}'.format(Key)
-    print 'AGENCY: {0}'.format(Code[Key][0])
-    print 'COUNTRY: {0}'.format(Code[Key][1])
+    print('CODE: {0}'.format(Key))
+    print('AGENCY: {0}'.format(Code[Key][0]))
+    print('COUNTRY: {0}'.format(Code[Key][1]))
   else:
-    print 'Warning: Code not found'
+    print('Warning: Code not found')
 
 Code = {'AAA' : ['Alma-ata','Kazakhstan'],
         'AAB' : ['Alma-ata 2','Kazakhstan'],
