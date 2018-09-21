@@ -85,14 +85,15 @@ def MagRangeSelect(Db, MinMag, MaxMag, Owrite=False, Any=False, TopEdge=False):
     for M in E['Magnitude']:
       m = M['MagSize'];
 
-      Chk1 = (m >= MinMag)
-      if TopEdge:
-        Chk2 = (m <= MaxMag)
-      else:
-        Chk2 = (m < MaxMag)
+      if m is not None:
+        Chk1 = (m >= MinMag)
+        if TopEdge:
+          Chk2 = (m <= MaxMag)
+        else:
+          Chk2 = (m < MaxMag)
 
-      if Chk1 and Chk2:
-        Event['Magnitude'].append(M)
+        if Chk1 and Chk2:
+          Event['Magnitude'].append(M)
 
     if Event['Magnitude']:
       Event['Id'] = E['Id']
