@@ -4,6 +4,7 @@
 
 http://cdn.ftp.openquake.org/wheelhouse/linux/py36/numpy-1.14.2-cp36-cp36m-manylinux1_x86_64.whl
 http://cdn.ftp.openquake.org/wheelhouse/linux/py36/scipy-1.0.1-cp36-cp36m-manylinux1_x86_64.whl
+http://cdn.ftp.openquake.org/wheelhouse/linux/py36/Shapely-1.6.4.post1-cp36-cp36m-manylinux1_x86_64.whl
 http://cdn.ftp.openquake.org/wheelhouse/linux/py/python_dateutil-2.7.2-py2.py3-none-any.whl
 http://cdn.ftp.openquake.org/wheelhouse/linux/py/pyparsing-2.2.0-py2.py3-none-any.whl
 http://cdn.ftp.openquake.org/wheelhouse/linux/py/cycler-0.10.0-py2.py3-none-any.whl
